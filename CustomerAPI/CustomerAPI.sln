@@ -1,0 +1,41 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{213709AB-9DAB-43D9-B6B9-6F4249639BA1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E5F63E9C-2BCB-4456-BD59-6F6DC775FE9A}"
+	ProjectSection(SolutionItems) = preProject
+		global.json = global.json
+	EndProjectSection
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "CustomerAPI", "src\CustomerAPI\CustomerAPI.xproj", "{976D3A74-BDCC-4BF8-B449-CB7AFCD3B273}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{6701D5FD-8A7F-49CB-9D49-BB4ABCC71385}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "CustomerAPITests", "tests\CustomerAPITests\CustomerAPITests.xproj", "{E4E2C0A9-E306-410D-AF3F-DF04A4683CB0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{976D3A74-BDCC-4BF8-B449-CB7AFCD3B273}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{976D3A74-BDCC-4BF8-B449-CB7AFCD3B273}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{976D3A74-BDCC-4BF8-B449-CB7AFCD3B273}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{976D3A74-BDCC-4BF8-B449-CB7AFCD3B273}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E4E2C0A9-E306-410D-AF3F-DF04A4683CB0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E4E2C0A9-E306-410D-AF3F-DF04A4683CB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E4E2C0A9-E306-410D-AF3F-DF04A4683CB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E4E2C0A9-E306-410D-AF3F-DF04A4683CB0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{976D3A74-BDCC-4BF8-B449-CB7AFCD3B273} = {213709AB-9DAB-43D9-B6B9-6F4249639BA1}
+		{E4E2C0A9-E306-410D-AF3F-DF04A4683CB0} = {6701D5FD-8A7F-49CB-9D49-BB4ABCC71385}
+	EndGlobalSection
+EndGlobal
