@@ -41,7 +41,7 @@ namespace CustomerAPI.Controllers.Tests
             {
                 //arrange
                 var customers = CreateCustomerList(DefaultCustomerCount);
-                Populates(customersDbContext, customers);
+                PopulateTestCustomers(customersDbContext, customers);
                 var customersController = new CustomersController(customersDbContext);
 
                 //act
@@ -64,7 +64,7 @@ namespace CustomerAPI.Controllers.Tests
             {
                 //arrange
                 var customerList = CreateCustomerList(DefaultCustomerCount);
-                Populates(customersDbContext, customerList);
+                PopulateTestCustomers(customersDbContext, customerList);
                 var customersController = new CustomersController(customersDbContext);
 
                 //act
@@ -86,7 +86,7 @@ namespace CustomerAPI.Controllers.Tests
             {
                 //arrange
                 var customerList = CreateCustomerList(DefaultCustomerCount);
-                Populates(customersDbContext, customerList);
+                PopulateTestCustomers(customersDbContext, customerList);
                 var customersController = new CustomersController(customersDbContext);
 
                 //act
@@ -162,7 +162,7 @@ namespace CustomerAPI.Controllers.Tests
             {
                 //arrange
                 var customers = CreateCustomerList(DefaultCustomerCount).ToList();
-                Populates(customersDbContext, customers);
+                PopulateTestCustomers(customersDbContext, customers);
                 var customersController = new CustomersController(customersDbContext);
                 var customerUpdateInfo = new CustomerUpdateInfo
                 {
@@ -194,7 +194,7 @@ namespace CustomerAPI.Controllers.Tests
             {
                 //arrange
                 var customers = CreateCustomerList(DefaultCustomerCount);
-                Populates(customersDbContext, customers);
+                PopulateTestCustomers(customersDbContext, customers);
                 var customersController = new CustomersController(customersDbContext);
 
                 //act
@@ -216,7 +216,7 @@ namespace CustomerAPI.Controllers.Tests
         /// </summary>
         private CustomersDbContext CreateDbContext()
         {
-            return new CustomersDbContext($"TestDatabase{DateTime.Now.Ticks}");
+            return new CustomersDbContext($"TestDatabase{Guid.NewGuid()}");
         }
 
         /// <summary>
@@ -256,7 +256,7 @@ namespace CustomerAPI.Controllers.Tests
         /// </summary>
         /// <param name="customersDbContext">CustomerDbContext to use</param>
         /// <param name="customerList"></param>
-        public void Populates(CustomersDbContext customersDbContext, IEnumerable<CustomerEntity> customerList)
+        public void PopulateTestCustomers(CustomersDbContext customersDbContext, IEnumerable<CustomerEntity> customerList)
         {
             foreach (var customer in customerList)
             {

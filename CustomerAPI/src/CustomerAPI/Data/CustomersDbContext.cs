@@ -7,58 +7,46 @@ namespace CustomerAPI.Data
 {
     public class CustomersDbContext : DbContext
     {
-        private string _DatabaseName = null;
+        private readonly string _databaseName = null;
 
         public virtual DbSet<CustomerEntity> Customers { get; set; }
 
-        public CustomersDbContext()
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="databaseName">Name of database. If null or empty, a default database will be used.</param>
+        public CustomersDbContext(string databaseName = null)
         {
-        }
-
-        public CustomersDbContext(string databaseName)
-        {
-            if (string.IsNullOrEmpty(databaseName))
-            {
-                throw new ArgumentNullException("databaseName can't be null");
-            }
-
-            _DatabaseName = databaseName;
+            _databaseName = databaseName;
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
-            if (_DatabaseName == null)
+            if (_databaseName == null)
             {
                 options.UseInMemoryDatabase();
             }
             else
             {
-                options.UseInMemoryDatabase(_DatabaseName);
+                options.UseInMemoryDatabase(_databaseName);
             }
         }
 
         internal void UpdateCustomer(CustomerEntity customer, CustomerUpdateInfo customerUpdateInfo)
         {
-            customer.Address = customerUpdateInfo.Address;
-            customer.City = customerUpdateInfo.City;
-            customer.FirstName = customerUpdateInfo.FirstName;
-            customer.LastName = customerUpdateInfo.LastName;
-            customer.PhoneNumber = customerUpdateInfo.PhoneNumber;
-            customer.State = customerUpdateInfo.State;
-            customer.ZipCode = customerUpdateInfo.ZipCode;
+            foreach (var item in customerUpdateInfo.GetType().GetTypeInfo().GetProperties())
+            {
+                var desinationPropertyInfo = typeof(CustomerEntity).GetProperty(item.Name);
+                desinationPropertyInfo?.SetValue(customer, item.GetValue(customerUpdateInfo));
+            }
         }
 
         internal bool ValidateCustomerUpdateInfo(CustomerUpdateInfo customerInfo)
         {
-            if (customerInfo == null ||
-                string.IsNullOrEmpty(customerInfo.FirstName) || 
-                string.IsNullOrEmpty(customerInfo.LastName) ||
-                string.IsNullOrEmpty(customerInfo.PhoneNumber))
-            {
-                return false;
-            }
-
-            return true;
+            return customerInfo != null
+                && !string.IsNullOrEmpty(customerInfo.FirstName)
+                && !string.IsNullOrEmpty(customerInfo.LastName)
+                && !string.IsNullOrEmpty(customerInfo.PhoneNumber);
         }
 
         internal bool ValidateCustomerEntityInfo(CustomerEntity customerInfo)
