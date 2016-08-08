@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using CustomerAPI.Data;
+using Swashbuckle.Swagger.Model;
 
 namespace CustomerAPI
 {
@@ -29,6 +30,21 @@ namespace CustomerAPI
 
             //Add CustomerDbContext
             services.AddSingleton<CustomersDbContext>(new CustomersDbContext());
+
+            services.AddSwaggerGen();
+
+            services.ConfigureSwaggerGen(options =>
+            {
+                options.SingleApiVersion(new Info
+                {
+                    Version = "v1",
+                    Title = "Customer Demo API",
+                    Description = "Customer Demo API",
+                    TermsOfService = "None"
+                });
+                options.DescribeAllEnumsAsStrings();
+            });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -38,6 +54,9 @@ namespace CustomerAPI
             loggerFactory.AddDebug();
 
             app.UseMvc();
+
+            app.UseSwagger();
+            app.UseSwaggerUi();
         }
     }
 }

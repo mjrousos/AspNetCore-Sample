@@ -18,21 +18,21 @@ namespace CustomerAPI.Controllers
             _customersDbContext = customersDbContext;
         }
 
-        // GET: api/values
+        // GET: api/Customers
         [HttpGet]
         public IEnumerable<CustomerEntity> Get()
         {
             return _customersDbContext.Customers;
         }
 
-        // GET api/values/5
-        [HttpGet("{Guid}")]
+        // GET api/Customers/5
+        [HttpGet("{id}")]
         public CustomerEntity Get(Guid id)
         {
             return _customersDbContext.Customers.FirstOrDefault(c => c.Id == id);
         }
 
-        // POST api/values
+        // POST api/Customers
         [HttpPost]
         public IActionResult Post([FromBody]CustomerEntity customerInfo)
         {
@@ -46,8 +46,8 @@ namespace CustomerAPI.Controllers
             return new OkResult();
         }
 
-        // PUT api/values/5
-        [HttpPut("{Guid}")]
+        // PUT api/Customers/5
+        [HttpPut("{id}")]
         public void Put(Guid id, [FromBody]CustomerUpdateInfo customerUpdateInfo)
         {
             var customer = _customersDbContext.Customers.FirstOrDefault(c => c.Id == id);
@@ -59,8 +59,8 @@ namespace CustomerAPI.Controllers
             }
         }
 
-        // DELETE api/values/5
-        [HttpDelete("{Guid}")]
+        // DELETE api/Customers/5
+        [HttpDelete("{id}")]
         public void Delete(Guid id)
         {
             var customer = _customersDbContext.Customers.FirstOrDefault(c => c.Id == id);
