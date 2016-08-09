@@ -1,0 +1,12 @@
+﻿@using CustomersMVC.Customers;
+@using System.Collections.Generic;
+
+@model IEnumerable<CustomerEntity>
+
+<ul>
+    @foreach (var customer in Model)
+    {
+        <li>@customer.FirstName</li>
+        <li>@customer.LastName</li>
+    }
+</ul>
