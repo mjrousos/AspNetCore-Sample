@@ -3,10 +3,24 @@
 
 @model IEnumerable<CustomerEntity>
 
-<ul>
-    @foreach (var customer in Model)
-    {
-        <li>@customer.FirstName</li>
-        <li>@customer.LastName</li>
-    }
-</ul>
+<table>
+    <thead>
+        <tr style="background-color:lightblue">
+            <td>ID</td>
+            <td>FirstName</td>
+            <td>LastName</td>
+            <td>Phone</td>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var customer in Model)
+            {
+            <tr>
+                <td>@customer.Id</td>
+                <td>@customer.FirstName</td>
+                <td>@customer.LastName</td>
+                <td>@customer.PhoneNumber</td>
+            </tr>
+        }
+    </tbody>
+</table>

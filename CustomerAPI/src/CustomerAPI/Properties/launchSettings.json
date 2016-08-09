@@ -19,7 +19,7 @@
     "CustomerAPI": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "http://localhost:5000/api/values",
+      "launchUrl": "http://localhost:6000/api/customers",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
