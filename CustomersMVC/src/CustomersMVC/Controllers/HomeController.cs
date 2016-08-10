@@ -40,18 +40,14 @@ namespace CustomersMVC.Controllers
             };
 
             await _customersService.AddCustomerAsync(customer);
-
-            var customersList = await _customersService.GetCustomersListAsync();
-            return View("CustomersList", customersList);
+            return RedirectToAction("CustomersList");
         }
 
         [Route("[Controller]/[Action]/{customerId}")]
         public async Task<IActionResult> DeleteCustomer(Guid customerId)
         {
             await _customersService.DeleteCustomerAsync(customerId);
-
-            var customersList = await _customersService.GetCustomersListAsync();
-            return View("CustomersList", customersList);
+            return RedirectToAction("CustomersList");
         }
     }
 }
