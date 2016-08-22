@@ -30,7 +30,12 @@
 
   "buildOptions": {
     "emitEntryPoint": true,
-    "preserveCompilationContext": true
+    "preserveCompilationContext": true,
+    "compile": [
+      "../../../shared/Data/CustomerEntity.cs",
+      "../../../shared/Data/CustomerUpdateInfo.cs",
+      "../../../shared/Resources/ResourceStrings.cs"
+    ]
   },
 
   "runtimeOptions": {

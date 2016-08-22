@@ -6,8 +6,8 @@
   </PropertyGroup>
   <Import Project="$(VSToolsPath)\DotNet\Microsoft.DotNet.Props" Condition="'$(VSToolsPath)' != ''" />
   <PropertyGroup Label="Globals">
-    <ProjectGuid>e4e2c0a9-e306-410d-af3f-df04a4683cb0</ProjectGuid>
-    <RootNamespace>CustomerAPITests</RootNamespace>
+    <ProjectGuid>976d3a74-bdcc-4bf8-b449-cb7afcd3b273</ProjectGuid>
+    <RootNamespace>CustomerAPI</RootNamespace>
     <BaseIntermediateOutputPath Condition="'$(BaseIntermediateOutputPath)'=='' ">.\obj</BaseIntermediateOutputPath>
     <OutputPath Condition="'$(OutputPath)'=='' ">.\bin\</OutputPath>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
@@ -15,8 +15,16 @@
   <PropertyGroup>
     <SchemaVersion>2.0</SchemaVersion>
   </PropertyGroup>
+  <Import Project="$(VSToolsPath)\DotNet.Web\Microsoft.DotNet.Web.targets" Condition="'$(VSToolsPath)' != ''" />
   <ItemGroup>
-    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
+    <Compile Include="..\..\..\shared\Data\CustomerEntity.cs">
+      <Link>Shared/Data/CustomerEntity.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\shared\Data\CustomerUpdateInfo.cs">
+      <Link>Shared/Data/CustomerUpdateInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\shared\Resources\ResourceStrings.cs">
+      <Link>Shared/Resources/ResourceStrings.cs</Link>
+    </Compile>
   </ItemGroup>
-  <Import Project="$(VSToolsPath)\DotNet\Microsoft.DotNet.targets" Condition="'$(VSToolsPath)' != ''" />
 </Project>

@@ -1,9 +1,13 @@
-﻿namespace CustomerAPI.Data.DataEntities
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace CustomersShared.Data.DataEntities
 {
-    public class CustomerUpdateInfo
+    public class UpdateableCustomerInfo
     {
+        [Required]
         public string FirstName {get; set;}
 
+        [Required]
         public string LastName { get; set; }
 
         public string PhoneNumber { get; set; }

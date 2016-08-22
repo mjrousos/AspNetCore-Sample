@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace CustomerAPI.Data.DataEntities
+namespace CustomersShared.Data.DataEntities
 {
     [Table("Customers")]
     public class CustomerEntity
@@ -17,7 +17,6 @@ namespace CustomerAPI.Data.DataEntities
         [Required]
         public virtual string LastName { get; set; }
 
-        [Required]
         public virtual string PhoneNumber { get; set; }
 
         public virtual string Address { get; set; }
