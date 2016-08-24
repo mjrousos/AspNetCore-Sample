@@ -20,11 +20,8 @@
     <Compile Include="..\..\..\shared\Data\CustomerEntity.cs">
       <Link>Shared/Data/CustomerEntity.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\shared\Data\CustomerUpdateInfo.cs">
-      <Link>Shared/Data/CustomerUpdateInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\shared\Resources\ResourceStrings.cs">
-      <Link>Shared/Resources/ResourceStrings.cs</Link>
+    <Compile Include="..\..\..\shared\Data\UpdateableCustomerInfo.cs">
+      <Link>Shared/Data/UpdateableCustomerInfo.cs</Link>
     </Compile>
   </ItemGroup>
 </Project>

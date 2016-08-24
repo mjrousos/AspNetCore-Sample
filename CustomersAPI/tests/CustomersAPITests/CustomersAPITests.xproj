@@ -19,15 +19,4 @@
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\DotNet\Microsoft.DotNet.targets" Condition="'$(VSToolsPath)' != ''" />
-  <ItemGroup>
-    <Compile Include="..\..\..\shared\Data\CustomerEntity.cs">
-      <Link>Shared/Data/CustomerEntity.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\shared\Data\CustomerUpdateInfo.cs">
-      <Link>Shared/Data/CustomerUpdateInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\shared\Resources\ResourceStrings.cs">
-      <Link>Shared/Resources/ResourceStrings.cs</Link>
-    </Compile>
-  </ItemGroup>
 </Project>

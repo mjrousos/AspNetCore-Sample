@@ -1,6 +1,5 @@
 ﻿using CustomerAPI.Data;
 using CustomersShared.Data.DataEntities;
-using CustomersShared.Resources;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,12 +7,17 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Resources;
 using Xunit;
 
 namespace CustomerAPI.Controllers.Tests
 {
     public class CustomersControllerTests
     {
+        private const string CustomerInfoInvalidErrorText = "CustomerInfo is not valid!";
+        private const string InternalServerErrorText = "Something unexpected went wrong during the request!";
+        private const string CustomerNotFoundErrorText = "Could not find customer with Id of {0}";
         private readonly IEnumerable<CustomerEntity> SampleListOfCustomerEntities;
 
         public CustomersControllerTests()
@@ -29,7 +33,7 @@ namespace CustomerAPI.Controllers.Tests
             using (var customersDbContext = CreateTestDbContext())
             {
                 //arrange
-                var customersController = new CustomersController(customersDbContext);
+                var customersController = CreateTestCustomersController(customersDbContext);
 
                 //act
                 var result = customersController.Get();
@@ -45,7 +49,7 @@ namespace CustomerAPI.Controllers.Tests
             using (var customersDbContext = CreateTestDbContext(SampleListOfCustomerEntities))
             {
                 //arrange
-                var customersController = new CustomersController(customersDbContext);
+                var customersController = CreateTestCustomersController(customersDbContext);
 
                 //act
                 var result = customersController.Get();
@@ -63,14 +67,14 @@ namespace CustomerAPI.Controllers.Tests
             using (var customersDbContext = CreateTestDbContext(SampleListOfCustomerEntities))
             {
                 //arrange
-                var customersController = new CustomersController(customersDbContext);
+                var customersController = CreateTestCustomersController(customersDbContext);
 
                 //act
                 var guid = Guid.NewGuid();
                 var result = customersController.Get(guid);
 
                 Assert.Equal(StatusCodes.Status404NotFound, result.StatusCode);
-                Assert.Equal(ResourceStrings.GetCustomerNotFoundText(guid), result.Value);
+                Assert.Equal(String.Format(CustomerNotFoundErrorText, guid), result.Value);
             }
         }
 
@@ -80,7 +84,7 @@ namespace CustomerAPI.Controllers.Tests
             using (var customersDbContext = CreateTestDbContext(SampleListOfCustomerEntities))
             {
                 //arrange
-                var customersController = new CustomersController(customersDbContext);
+                var customersController = CreateTestCustomersController(customersDbContext);
 
                 //act
                 foreach (var customer in SampleListOfCustomerEntities)
@@ -99,13 +103,13 @@ namespace CustomerAPI.Controllers.Tests
             using (var customersDbContext = CreateTestDbContext())
             {
                 //arrange
-                var customersController = new CustomersController(customersDbContext);
+                var customersController = CreateTestCustomersController(customersDbContext);
 
                 //act
                 var result = customersController.Post(null);
 
                 //assert
-                Assert.Equal(ResourceStrings.CustomerInvalidInfoText, result.Value);
+                Assert.Equal(CustomerInfoInvalidErrorText, result.Value);
                 Assert.Equal(StatusCodes.Status400BadRequest, result.StatusCode);
             }
         }
@@ -117,13 +121,13 @@ namespace CustomerAPI.Controllers.Tests
             using (var customersDbContext = CreateTestDbContext())
             {
                 //arrange
-                var customersController = new CustomersController(customersDbContext);
+                var customersController = CreateTestCustomersController(customersDbContext);
 
                 //act
                 var result = customersController.Post(new UpdateableCustomerInfo());
 
                 //assert
-                Assert.Equal(ResourceStrings.CustomerInvalidInfoText, result.Value);
+                Assert.Equal(CustomerInfoInvalidErrorText, result.Value);
                 Assert.Equal(StatusCodes.Status400BadRequest, result.StatusCode);
             }
         }
@@ -134,7 +138,7 @@ namespace CustomerAPI.Controllers.Tests
             using (var customersDbContext = CreateTestDbContext())
             {
                 //arrange
-                var customersController = new CustomersController(customersDbContext);
+                var customersController = CreateTestCustomersController(customersDbContext);
                 var newCustomer = new UpdateableCustomerInfo
                 {
                     FirstName = "Jon",
@@ -162,7 +166,7 @@ namespace CustomerAPI.Controllers.Tests
             using (var customersDbContext = CreateTestDbContext(SampleListOfCustomerEntities))
             {
                 //arrange
-                var customersController = new CustomersController(customersDbContext);
+                var customersController = CreateTestCustomersController(customersDbContext);
 
                 //act
                 var customerEntity = SampleListOfCustomerEntities.First();
@@ -170,7 +174,7 @@ namespace CustomerAPI.Controllers.Tests
 
                 //assert
                 Assert.Equal(StatusCodes.Status400BadRequest, result.StatusCode);
-                Assert.Equal(ResourceStrings.CustomerInvalidInfoText, result.Value);
+                Assert.Equal(CustomerInfoInvalidErrorText, result.Value);
 
                 var getCustomerResult = customersController.Get(customerEntity.Id);
                 Assert.Equal(StatusCodes.Status200OK, getCustomerResult.StatusCode);
@@ -185,7 +189,7 @@ namespace CustomerAPI.Controllers.Tests
             using (var customersDbContext = CreateTestDbContext(SampleListOfCustomerEntities))
             {
                 //arrange
-                var customersController = new CustomersController(customersDbContext);
+                var customersController = CreateTestCustomersController(customersDbContext);
 
                 var customerUpdateInfo = new UpdateableCustomerInfo
                 {
@@ -200,7 +204,7 @@ namespace CustomerAPI.Controllers.Tests
 
                 //assert
                 Assert.Equal(StatusCodes.Status404NotFound, result.StatusCode);
-                Assert.Equal(ResourceStrings.GetCustomerNotFoundText(guid), result.Value);
+                Assert.Equal(String.Format(CustomerNotFoundErrorText, guid), result.Value);
             }
         }
 
@@ -210,7 +214,7 @@ namespace CustomerAPI.Controllers.Tests
             using (var customersDbContext = CreateTestDbContext(SampleListOfCustomerEntities))
             {
                 //arrange
-                var customersController = new CustomersController(customersDbContext);
+                var customersController = CreateTestCustomersController(customersDbContext);
 
                 var customerUpdateInfo = new UpdateableCustomerInfo
                 {
@@ -239,7 +243,7 @@ namespace CustomerAPI.Controllers.Tests
             using (var customersDbContext = CreateTestDbContext(SampleListOfCustomerEntities))
             {
                 //arrange
-                var customersController = new CustomersController(customersDbContext);
+                var customersController = CreateTestCustomersController(customersDbContext);
 
                 //act
                 var guid = Guid.NewGuid();
@@ -247,7 +251,7 @@ namespace CustomerAPI.Controllers.Tests
 
                 //assert
                 Assert.Equal(StatusCodes.Status404NotFound, customerResult.StatusCode);
-                Assert.Equal(ResourceStrings.GetCustomerNotFoundText(guid), customerResult.Value);
+                Assert.Equal(String.Format(CustomerNotFoundErrorText, guid), customerResult.Value);
             }
         }
 
@@ -257,7 +261,7 @@ namespace CustomerAPI.Controllers.Tests
             using (var customersDbContext = CreateTestDbContext(SampleListOfCustomerEntities))
             {
                 //arrange
-                var customersController = new CustomersController(customersDbContext);
+                var customersController = CreateTestCustomersController(customersDbContext);
 
                 //act
                 var customerToRemoveId = SampleListOfCustomerEntities.First().Id;
@@ -313,7 +317,12 @@ namespace CustomerAPI.Controllers.Tests
         /// </summary>
         private CustomersController CreateTestCustomersController(CustomersDbContext customersDbContext)
         {
-            return new CustomersController(customersDbContext);
+            return new CustomersController(
+                customersDbContext,
+                new ResourceManager(
+                    "CustomersAPI.Resources.StringResources",
+                    typeof(CustomersController).GetTypeInfo().Assembly)
+            );
         }
 
         /// <summary>

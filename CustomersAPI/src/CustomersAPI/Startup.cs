@@ -6,6 +6,10 @@ using Microsoft.Extensions.Logging;
 using CustomerAPI.Data;
 using Swashbuckle.Swagger.Model;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
+using Microsoft.AspNetCore.Localization;
+using System.Resources;
+using System.Reflection;
 
 namespace CustomerAPI
 {
@@ -15,7 +19,7 @@ namespace CustomerAPI
         {
             /* This section adds in configuration from different configuration sources including
                .json files and environment variables
-            */ 
+            */
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
@@ -49,13 +53,35 @@ namespace CustomerAPI
             // Add entity framework CustomersDBContext
             services.AddSingleton(CreateCustomersDbContext());
 
+            //Add ResourceManager singleton
+            services.AddSingleton(new ResourceManager("CustomersAPI.Resources.StringResources",
+                                                      typeof(Startup).GetTypeInfo().Assembly));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+            //Add some logging options
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
+
+            /* Add Global/Localization support for more information see 
+               https://docs.asp.net/en/latest/fundamentals/localization.html */
+            var supportedCultures = new[]
+              {
+                    new CultureInfo("en-US"),
+                    new CultureInfo("es-MX"),
+                    new CultureInfo("fr-FR"),
+              };
+
+            app.UseRequestLocalization(new RequestLocalizationOptions
+            {
+                DefaultRequestCulture = new RequestCulture("en-US"),
+                // Formatting numbers, dates, etc.
+                SupportedCultures = supportedCultures,
+                // UI strings that we have localized.
+                SupportedUICultures = supportedCultures
+            });
 
             app.UseMvc();
 

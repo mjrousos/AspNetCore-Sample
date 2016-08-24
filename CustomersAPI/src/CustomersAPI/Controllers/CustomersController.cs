@@ -1,11 +1,11 @@
 ﻿using CustomerAPI.Data;
 using CustomersShared.Data.DataEntities;
-using CustomersShared.Resources;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Resources;
 
 namespace CustomerAPI.Controllers
 {
@@ -13,10 +13,12 @@ namespace CustomerAPI.Controllers
     public class CustomersController : Controller
     {
         private readonly CustomersDbContext _customersDbContext;
+        private readonly ResourceManager _resourceManager; 
 
-        public CustomersController(CustomersDbContext customersDbContext)
+        public CustomersController(CustomersDbContext customersDbContext, ResourceManager resourceManager)
         {
             _customersDbContext = customersDbContext;
+            _resourceManager = resourceManager;
         }
 
         // GET: api/Customers
@@ -34,7 +36,7 @@ namespace CustomerAPI.Controllers
 
             if (customer == null)
             {
-                return new NotFoundObjectResult(ResourceStrings.GetCustomerNotFoundText(id));
+                return new NotFoundObjectResult(string.Format(_resourceManager.GetString("CustomerNotFound"), id));
             }
 
             return new OkObjectResult(customer);
@@ -46,7 +48,7 @@ namespace CustomerAPI.Controllers
         {
             if (!_customersDbContext.ValidateUpdateableCustomerInfo(customerInfo))
             {
-                return BadRequest(ResourceStrings.CustomerInvalidInfoText);
+                return BadRequest(_resourceManager.GetString("CustomerInfoInvalid"));
             }
 
             try
@@ -55,14 +57,16 @@ namespace CustomerAPI.Controllers
 
                 if (customer == null)
                 {
-                    return StatusCode(StatusCodes.Status500InternalServerError, ResourceStrings.InternalServerErrorText);
+                    return StatusCode(StatusCodes.Status500InternalServerError, 
+                                      _resourceManager.GetString("UnexpectedServerError"));
                 }
 
                 return new OkObjectResult(customer);
             }
             catch
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ResourceStrings.InternalServerErrorText);
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                                  _resourceManager.GetString("UnexpectedServerError"));
             }
         }
 
@@ -72,14 +76,14 @@ namespace CustomerAPI.Controllers
         {
             if (!_customersDbContext.ValidateUpdateableCustomerInfo(customerUpdateInfo))
             {
-                return BadRequest(ResourceStrings.CustomerInvalidInfoText);
+                return BadRequest(_resourceManager.GetString("CustomerInfoInvalid"));
             }
 
             var customer = _customersDbContext.Customers.FirstOrDefault(c => c.Id == id);
 
             if (customer == null)
             {
-                return new NotFoundObjectResult(ResourceStrings.GetCustomerNotFoundText(id));
+                return new NotFoundObjectResult(string.Format(_resourceManager.GetString("CustomerNotFound"), id));
             }
 
             try
@@ -102,7 +106,7 @@ namespace CustomerAPI.Controllers
 
             if (customer == null)
             {
-                return new NotFoundObjectResult(ResourceStrings.GetCustomerNotFoundText(id));
+                return new NotFoundObjectResult(string.Format(_resourceManager.GetString("CustomerNotFound"), id));
             }
 
             try
@@ -113,7 +117,8 @@ namespace CustomerAPI.Controllers
             }
             catch
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ResourceStrings.InternalServerErrorText);
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                                  _resourceManager.GetString("UnexpectedServerError"));
             }
         }
     }
