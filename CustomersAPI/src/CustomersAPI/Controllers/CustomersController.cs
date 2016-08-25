@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Resources;
 
 namespace CustomerAPI.Controllers
@@ -12,12 +11,12 @@ namespace CustomerAPI.Controllers
     [Route("api/[controller]")]
     public class CustomersController : Controller
     {
-        private readonly CustomersDbContext _customersDbContext;
-        private readonly ResourceManager _resourceManager; 
+        private readonly ICustomersDataProvider _customersDataProvider;
+        private readonly ResourceManager _resourceManager;
 
-        public CustomersController(CustomersDbContext customersDbContext, ResourceManager resourceManager)
+        public CustomersController(ICustomersDataProvider customersDataProvider, ResourceManager resourceManager)
         {
-            _customersDbContext = customersDbContext;
+            _customersDataProvider = customersDataProvider;
             _resourceManager = resourceManager;
         }
 
@@ -25,101 +24,83 @@ namespace CustomerAPI.Controllers
         [HttpGet]
         public IEnumerable<CustomerEntity> Get()
         {
-            return _customersDbContext.Customers;
+            return _customersDataProvider.GetCustomers();
         }
 
         // GET api/Customers/5
         [HttpGet("{id}")]
         public ObjectResult Get(Guid id)
         {
-            var customer = _customersDbContext.Customers.FirstOrDefault(c => c.Id == id);
+            CustomerEntity customer;
 
-            if (customer == null)
+            if (!_customersDataProvider.TryFindCustomer(id, out customer))
             {
                 return new NotFoundObjectResult(string.Format(_resourceManager.GetString("CustomerNotFound"), id));
             }
 
-            return new OkObjectResult(customer);
+            return Ok(customer);
         }
 
         // POST api/Customers
         [HttpPost]
-        public ObjectResult Post([FromBody]UpdateableCustomerInfo customerInfo)
+        public ObjectResult Post([FromBody]CustomerDataTransferObject customerDataTransferObject)
         {
-            if (!_customersDbContext.ValidateUpdateableCustomerInfo(customerInfo))
+            if (customerDataTransferObject == null || !customerDataTransferObject.ValidateCustomerDataTransferObject())
             {
                 return BadRequest(_resourceManager.GetString("CustomerInfoInvalid"));
             }
 
-            try
-            {
-                var customer = _customersDbContext.AddCustomer(customerInfo);
-
-                if (customer == null)
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError, 
-                                      _resourceManager.GetString("UnexpectedServerError"));
-                }
-
-                return new OkObjectResult(customer);
-            }
-            catch
+            CustomerEntity customerAdded;
+            if (!_customersDataProvider.TryAddCustomer(customerDataTransferObject, out customerAdded))
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
                                   _resourceManager.GetString("UnexpectedServerError"));
             }
+
+            return Ok(customerAdded);
         }
 
         // PUT api/Customers/5
         [HttpPut("{id}")]
-        public ObjectResult Put(Guid id, [FromBody]UpdateableCustomerInfo customerUpdateInfo)
+        public ObjectResult Put(Guid id, [FromBody]CustomerDataTransferObject customerDataTransferObject)
         {
-            if (!_customersDbContext.ValidateUpdateableCustomerInfo(customerUpdateInfo))
+            if (customerDataTransferObject == null || !customerDataTransferObject.ValidateCustomerDataTransferObject())
             {
                 return BadRequest(_resourceManager.GetString("CustomerInfoInvalid"));
             }
 
-            var customer = _customersDbContext.Customers.FirstOrDefault(c => c.Id == id);
-
-            if (customer == null)
+            if (!_customersDataProvider.CustomerExists(id))
             {
                 return new NotFoundObjectResult(string.Format(_resourceManager.GetString("CustomerNotFound"), id));
             }
 
-            try
+            CustomerEntity customerUpdated;
+            if (!_customersDataProvider.TryUpdateCustomer(id, customerDataTransferObject, out customerUpdated))
             {
-                _customersDbContext.UpdateCustomerInfo(customer, customerUpdateInfo);
-                _customersDbContext.SaveChanges();
-                return new OkObjectResult(customer);
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                                  _resourceManager.GetString("UnexpectedServerError"));
             }
-            catch
-            {
-               return StatusCode(StatusCodes.Status500InternalServerError, null);
-            }
+
+            return Ok(customerUpdated);
         }
 
         // DELETE api/Customers/5
         [HttpDelete("{id}")]
         public ObjectResult Delete(Guid id)
         {
-            var customer = _customersDbContext.Customers.FirstOrDefault(c => c.Id == id);
-
-            if (customer == null)
+            if (!_customersDataProvider.CustomerExists(id))
             {
                 return new NotFoundObjectResult(string.Format(_resourceManager.GetString("CustomerNotFound"), id));
             }
 
-            try
-            {
-                _customersDbContext.Customers.Remove(customer);
-                _customersDbContext.SaveChanges();
-                return new OkObjectResult(customer);
-            }
-            catch
+            CustomerEntity customerDeleted;
+            if (!_customersDataProvider.TryDeleteCustomer(id, out customerDeleted))
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
                                   _resourceManager.GetString("UnexpectedServerError"));
             }
+
+            return Ok(customerDeleted);
         }
     }
 }

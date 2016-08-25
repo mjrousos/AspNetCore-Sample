@@ -1,11 +1,11 @@
 ﻿using CustomerAPI.Data;
+using CustomerAPITests.CustomerDataProviders;
 using CustomersShared.Data.DataEntities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Resources;
@@ -13,27 +13,20 @@ using Xunit;
 
 namespace CustomerAPI.Controllers.Tests
 {
-    public class CustomersControllerTests
+    public class CustomersControllerTests: BaseCustomersDataProviderHelpers
     {
         private const string CustomerInfoInvalidErrorText = "CustomerInfo is not valid!";
         private const string InternalServerErrorText = "Something unexpected went wrong during the request!";
         private const string CustomerNotFoundErrorText = "Could not find customer with Id of {0}";
-        private readonly IEnumerable<CustomerEntity> SampleListOfCustomerEntities;
-
-        public CustomersControllerTests()
-        {
-            //populate SampleListOfCustomerEntites
-            SampleListOfCustomerEntities = CreateListOfCustomerEntities(10);
-        }
 
         //Test Get() method
         [Fact]
         public void GetWithNoCustomersReturnsEmptyEnumerable()
         {
-            using (var customersDbContext = CreateTestDbContext())
+            using (var customersDataProvider = CreateCustomersDataProvider())
             {
                 //arrange
-                var customersController = CreateTestCustomersController(customersDbContext);
+                var customersController = CreateTestCustomersController(customersDataProvider);
 
                 //act
                 var result = customersController.Get();
@@ -46,17 +39,17 @@ namespace CustomerAPI.Controllers.Tests
         [Fact]
         public void GetWithSomeCustomersReturnsEnumerableOfCustomers()
         {
-            using (var customersDbContext = CreateTestDbContext(SampleListOfCustomerEntities))
+            using (var customersDataProvider = CreateTestCustomerDataProvider(SampleListOfCustomerDataTransferObjects))
             {
                 //arrange
-                var customersController = CreateTestCustomersController(customersDbContext);
+                var customersController = CreateTestCustomersController(customersDataProvider);
 
                 //act
                 var result = customersController.Get();
 
                 //assert
-                Assert.Equal(SampleListOfCustomerEntities.Count(), result.Count());
-                Assert.Equal(0, SampleListOfCustomerEntities.Except(result).Count());
+                Assert.Equal(SampleListOfCustomerDataTransferObjects.Count(), result.Count());
+                CompareCustomerLists(SampleListOfCustomerDataTransferObjects, result);
             }
         }
 
@@ -64,10 +57,10 @@ namespace CustomerAPI.Controllers.Tests
         [Fact]
         public void GetByIdNonExistingCustomerReturns404NotFound()
         {
-            using (var customersDbContext = CreateTestDbContext(SampleListOfCustomerEntities))
+            using (var customersDataProvider = CreateTestCustomerDataProvider(SampleListOfCustomerDataTransferObjects))
             {
                 //arrange
-                var customersController = CreateTestCustomersController(customersDbContext);
+                var customersController = CreateTestCustomersController(customersDataProvider);
 
                 //act
                 var guid = Guid.NewGuid();
@@ -81,13 +74,13 @@ namespace CustomerAPI.Controllers.Tests
         [Fact]
         public void GetByIdReturnsCustomerWithCoorispondingId()
         {
-            using (var customersDbContext = CreateTestDbContext(SampleListOfCustomerEntities))
+            using (var customersDataProvider = CreateTestCustomerDataProvider(SampleListOfCustomerDataTransferObjects))
             {
                 //arrange
-                var customersController = CreateTestCustomersController(customersDbContext);
+                var customersController = CreateTestCustomersController(customersDataProvider);
 
                 //act
-                foreach (var customer in SampleListOfCustomerEntities)
+                foreach (var customer in customersDataProvider.GetCustomers())
                 {
                     var result = customersController.Get(customer.Id);
                     Assert.Equal(StatusCodes.Status200OK, result.StatusCode);
@@ -100,10 +93,10 @@ namespace CustomerAPI.Controllers.Tests
         [Fact]
         public void PostWithNullCustomerInfoReturnsBadRequest()
         {
-            using (var customersDbContext = CreateTestDbContext())
+            using (var customersDataProvider = CreateCustomersDataProvider())
             {
                 //arrange
-                var customersController = CreateTestCustomersController(customersDbContext);
+                var customersController = CreateTestCustomersController(customersDataProvider);
 
                 //act
                 var result = customersController.Post(null);
@@ -118,13 +111,13 @@ namespace CustomerAPI.Controllers.Tests
         [Fact]
         public void PostWithInvalidCustomerInfoReturnsBadRequest()
         {
-            using (var customersDbContext = CreateTestDbContext())
+            using (var customersDataProvider = CreateCustomersDataProvider())
             {
                 //arrange
-                var customersController = CreateTestCustomersController(customersDbContext);
+                var customersController = CreateTestCustomersController(customersDataProvider);
 
                 //act
-                var result = customersController.Post(new UpdateableCustomerInfo());
+                var result = customersController.Post(new CustomerDataTransferObject());
 
                 //assert
                 Assert.Equal(CustomerInfoInvalidErrorText, result.Value);
@@ -135,11 +128,11 @@ namespace CustomerAPI.Controllers.Tests
         [Fact]
         public void PostWithValidCustomerInfoAddsCustomerAndReturns200OK()
         {
-            using (var customersDbContext = CreateTestDbContext())
+            using (var customersDataProvider = CreateCustomersDataProvider())
             {
                 //arrange
-                var customersController = CreateTestCustomersController(customersDbContext);
-                var newCustomer = new UpdateableCustomerInfo
+                var customersController = CreateTestCustomersController(customersDataProvider);
+                var newCustomer = new CustomerDataTransferObject
                 {
                     FirstName = "Jon",
                     LastName = "Smith",
@@ -163,14 +156,14 @@ namespace CustomerAPI.Controllers.Tests
         [Fact]
         public void UpdateExistingCustomerWithBadUpdateInfoReturns400BadRequest()
         {
-            using (var customersDbContext = CreateTestDbContext(SampleListOfCustomerEntities))
+            using (var customersDataProvider = CreateTestCustomerDataProvider(SampleListOfCustomerDataTransferObjects))
             {
                 //arrange
-                var customersController = CreateTestCustomersController(customersDbContext);
+                var customersController = CreateTestCustomersController(customersDataProvider);
 
                 //act
-                var customerEntity = SampleListOfCustomerEntities.First();
-                var result = customersController.Put(customerEntity.Id, new UpdateableCustomerInfo());
+                var customerEntity = customersDataProvider.GetCustomers().First();
+                var result = customersController.Put(customerEntity.Id, new CustomerDataTransferObject());
 
                 //assert
                 Assert.Equal(StatusCodes.Status400BadRequest, result.StatusCode);
@@ -186,12 +179,12 @@ namespace CustomerAPI.Controllers.Tests
         [Fact]
         public void UpdateNonExistingCustomerReturns404NotFound()
         {
-            using (var customersDbContext = CreateTestDbContext(SampleListOfCustomerEntities))
+            using (var customersDataProvider = CreateTestCustomerDataProvider(SampleListOfCustomerDataTransferObjects))
             {
                 //arrange
-                var customersController = CreateTestCustomersController(customersDbContext);
+                var customersController = CreateTestCustomersController(customersDataProvider);
 
-                var customerUpdateInfo = new UpdateableCustomerInfo
+                var customerUpdateInfo = new CustomerDataTransferObject
                 {
                     FirstName = "Joe",
                     LastName = "Smith",
@@ -211,12 +204,12 @@ namespace CustomerAPI.Controllers.Tests
         [Fact]
         public void UpdateExistingCustomerInformationUpdatesAndReturns200OK()
         {
-            using (var customersDbContext = CreateTestDbContext(SampleListOfCustomerEntities))
+            using (var customersDataProvider = CreateTestCustomerDataProvider(SampleListOfCustomerDataTransferObjects))
             {
                 //arrange
-                var customersController = CreateTestCustomersController(customersDbContext);
+                var customersController = CreateTestCustomersController(customersDataProvider);
 
-                var customerUpdateInfo = new UpdateableCustomerInfo
+                var customerUpdateInfo = new CustomerDataTransferObject
                 {
                     FirstName = "Joe",
                     LastName = "Smith",
@@ -224,7 +217,7 @@ namespace CustomerAPI.Controllers.Tests
                 };
 
                 //act
-                var customerToUpdateId = SampleListOfCustomerEntities.First().Id;
+                var customerToUpdateId = customersDataProvider.GetCustomers().First().Id;
                 customersController.Put(customerToUpdateId, customerUpdateInfo);
 
                 //assert
@@ -240,10 +233,10 @@ namespace CustomerAPI.Controllers.Tests
         [Fact]
         public void DeleteNonExistingCustomerReturns404NotFound()
         {
-            using (var customersDbContext = CreateTestDbContext(SampleListOfCustomerEntities))
+            using (var customersDataProvider = CreateTestCustomerDataProvider(SampleListOfCustomerDataTransferObjects))
             {
                 //arrange
-                var customersController = CreateTestCustomersController(customersDbContext);
+                var customersController = CreateTestCustomersController(customersDataProvider);
 
                 //act
                 var guid = Guid.NewGuid();
@@ -258,13 +251,13 @@ namespace CustomerAPI.Controllers.Tests
         [Fact]
         public void DeleteExistingCustomerRemovesCustomerAndReturns200OK()
         {
-            using (var customersDbContext = CreateTestDbContext(SampleListOfCustomerEntities))
+            using (var customersDataProvider = CreateTestCustomerDataProvider(SampleListOfCustomerDataTransferObjects))
             {
                 //arrange
-                var customersController = CreateTestCustomersController(customersDbContext);
+                var customersController = CreateTestCustomersController(customersDataProvider);
 
                 //act
-                var customerToRemoveId = SampleListOfCustomerEntities.First().Id;
+                var customerToRemoveId = customersDataProvider.GetCustomers().First().Id;
                 var customerResult = customersController.Delete(customerToRemoveId);
 
                 //assert
@@ -276,10 +269,7 @@ namespace CustomerAPI.Controllers.Tests
         }
 
         #region TestHelpers
-        /// <summary>
-        /// Creates a test CustomersDbContext
-        /// </summary>
-        private CustomersDbContext CreateTestDbContext()
+        internal override ICustomersDataProvider CreateCustomersDataProvider()
         {
             // Create a fresh service provider, and therefore a fresh 
             // InMemory database instance.
@@ -289,63 +279,24 @@ namespace CustomerAPI.Controllers.Tests
 
             // Create a new options instance telling the context to use an
             // InMemory database and the new service provider.
-            var builder = new DbContextOptionsBuilder<CustomersDbContext>();
+            var builder = new DbContextOptionsBuilder<EFCustomersDataProvider>();
             builder.UseInMemoryDatabase()
-                   .UseInternalServiceProvider(serviceProvider);
+                       .UseInternalServiceProvider(serviceProvider);
 
-            return new CustomersDbContext(builder.Options);
-        }
-
-        /// <summary>
-        /// Creates a test CustomersDbContext with the CustomerEntities passed in
-        /// </summary>
-        private CustomersDbContext CreateTestDbContext(IEnumerable<CustomerEntity> customerList)
-        {
-            var customersDbContext = CreateTestDbContext();
-
-            foreach (var customerEntity in customerList)
-            {
-                customersDbContext.Add(customerEntity);
-                customersDbContext.SaveChanges();
-            }
-
-            return customersDbContext;
+            return new EFCustomersDataProvider(builder.Options);
         }
 
         /// <summary>
         /// Creates a test CustomersController to test with
         /// </summary>
-        private CustomersController CreateTestCustomersController(CustomersDbContext customersDbContext)
+        private CustomersController CreateTestCustomersController(ICustomersDataProvider customersDataProvider)
         {
             return new CustomersController(
-                customersDbContext,
+                customersDataProvider,
                 new ResourceManager(
                     "CustomersAPI.Resources.StringResources",
                     typeof(CustomersController).GetTypeInfo().Assembly)
             );
-        }
-
-        /// <summary>
-        /// Creates a list of customers for using in tests
-        /// </summary>
-        /// <param name="count">number of customers to put in the list</param>
-        private IEnumerable<CustomerEntity> CreateListOfCustomerEntities(int numberOfRecordsToCreate)
-        {
-            var customersList = new List<CustomerEntity>();
-
-            for (int i = 0; i < numberOfRecordsToCreate; i++)
-            {
-                customersList.Add(new CustomerEntity
-                {
-                    Id = Guid.NewGuid(),
-                    FirstName = $"CustFirst{i}",
-                    LastName = $"CustLast{i}",
-                    PhoneNumber = $"CustPhone{i}"
-                });
-            }
-
-            Assert.Equal(numberOfRecordsToCreate, customersList.Count());
-            return customersList;
         }
         #endregion
     }

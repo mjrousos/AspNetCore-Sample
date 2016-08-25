@@ -50,8 +50,8 @@ namespace CustomerAPI
                 options.DescribeAllEnumsAsStrings();
             });
 
-            // Add entity framework CustomersDBContext
-            services.AddSingleton(CreateCustomersDbContext());
+            // Add Entity Framework Customers data provider
+            services.AddSingleton<ICustomersDataProvider>(CreateCustomersDataProvider());
 
             //Add ResourceManager singleton
             services.AddSingleton(new ResourceManager("CustomersAPI.Resources.StringResources",
@@ -90,9 +90,9 @@ namespace CustomerAPI
         }
 
         /// <summary>
-        /// Creates a new CustomerDbContext with the options to create a new in memory database
+        /// Creates a new Customers data provider with the options to create a new in memory database
         /// </summary>
-        private CustomersDbContext CreateCustomersDbContext()
+        private ICustomersDataProvider CreateCustomersDataProvider()
         {
             // Create a fresh service provider, and therefore a fresh 
             // InMemory database instance.
@@ -102,11 +102,11 @@ namespace CustomerAPI
 
             // Create a new options instance telling the context to use an
             // InMemory database and the new service provider.
-            var builder = new DbContextOptionsBuilder<CustomersDbContext>();
+            var builder = new DbContextOptionsBuilder<EFCustomersDataProvider>();
             builder.UseInMemoryDatabase()
                    .UseInternalServiceProvider(serviceProvider);
 
-            return new CustomersDbContext(builder.Options);
+            return new EFCustomersDataProvider(builder.Options);
         }
 
     }

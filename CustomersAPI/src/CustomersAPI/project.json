@@ -17,7 +17,8 @@
     "Microsoft.EntityFrameworkCore": "1.0.0",
     "Microsoft.EntityFrameworkCore.InMemory": "1.0.0",
     "Swashbuckle": "6.0.0-beta901",
-    "Swashbuckle.SwaggerUi": "6.0.0-beta901"
+    "Swashbuckle.SwaggerUi": "6.0.0-beta901",
+    "CustomersDataModels": "1.0.0"
   },
 
   "tools": {
@@ -30,11 +31,7 @@
 
   "buildOptions": {
     "emitEntryPoint": true,
-    "preserveCompilationContext": true,
-    "compile": [
-      "../../../shared/Data/CustomerEntity.cs",
-      "../../../shared/Data/UpdateableCustomerInfo.cs"
-    ]
+    "preserveCompilationContext": true
   },
 
   "runtimeOptions": {

@@ -8,11 +8,12 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E5F63E9C-2BCB-4456-BD59-6F6DC775FE9A}"
 	ProjectSection(SolutionItems) = preProject
 		global.json = global.json
+		NuGet.config = NuGet.config
 	EndProjectSection
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "CustomersAPI", "src\CustomersAPI\CustomersAPI.xproj", "{976D3A74-BDCC-4BF8-B449-CB7AFCD3B273}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{6701D5FD-8A7F-49CB-9D49-BB4ABCC71385}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{4E9726EF-051F-4348-ACE7-BC19FC6D0F44}"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "CustomersAPITests", "tests\CustomersAPITests\CustomersAPITests.xproj", "{E4E2C0A9-E306-410D-AF3F-DF04A4683CB0}"
 EndProject
@@ -36,6 +37,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{976D3A74-BDCC-4BF8-B449-CB7AFCD3B273} = {213709AB-9DAB-43D9-B6B9-6F4249639BA1}
-		{E4E2C0A9-E306-410D-AF3F-DF04A4683CB0} = {6701D5FD-8A7F-49CB-9D49-BB4ABCC71385}
+		{E4E2C0A9-E306-410D-AF3F-DF04A4683CB0} = {4E9726EF-051F-4348-ACE7-BC19FC6D0F44}
 	EndGlobalSection
 EndGlobal
