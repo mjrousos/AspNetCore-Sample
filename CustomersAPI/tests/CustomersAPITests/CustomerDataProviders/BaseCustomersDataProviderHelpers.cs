@@ -36,7 +36,7 @@ namespace CustomerAPITests.CustomerDataProviders
 
             foreach (var customerInfo in customerList)
             {
-                customersDataProvider.AddCustomer(customerInfo);
+                customersDataProvider.AddCustomerAsync(customerInfo);
             }
 
             return customersDataProvider;

@@ -1,6 +1,7 @@
 ﻿using CustomersShared.Data.DataEntities;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace CustomerAPI.Data
 {
@@ -10,22 +11,20 @@ namespace CustomerAPI.Data
 
         bool CustomerExists(Guid id);
 
-        CustomerEntity AddCustomer(CustomerDataTransferObject customerDataTransferObject);
+        Task<CustomerEntity> AddCustomerAsync(CustomerDataTransferObject customerDataTransferObject);
 
-        CustomerEntity DeleteCustomer(Guid id);
+        Task<CustomerEntity> DeleteCustomerAsync(Guid id);
 
         CustomerEntity FindCustomer(Guid id);
 
-        CustomerEntity UpdateCustomer(Guid id, CustomerDataTransferObject customerDataTransferObject);
+        Task<CustomerEntity> UpdateCustomerAsync(Guid id, CustomerDataTransferObject customerDataTransferObject);
 
-        bool TryFindCustomer(Guid id, out CustomerEntity customerEntity);
+        CustomerDataActionResult TryFindCustomer(Guid id);
 
-        bool TryDeleteCustomer(Guid id, out CustomerEntity customerEntity);
+        Task<CustomerDataActionResult> TryDeleteCustomerAsync(Guid id);
 
-        bool TryAddCustomer(CustomerDataTransferObject customerDataTransferObject, out CustomerEntity customerEntity);
+        Task<CustomerDataActionResult> TryAddCustomerAsync(CustomerDataTransferObject customerDataTransferObject);
 
-        bool TryUpdateCustomer(Guid id,
-                               CustomerDataTransferObject customerDataTransferObject,
-                               out CustomerEntity customerEntity);
+        Task<CustomerDataActionResult> TryUpdateCustomerAsync(Guid id, CustomerDataTransferObject customerDataTransferObject);
     }
 }

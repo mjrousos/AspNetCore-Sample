@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Reflection;
 
 namespace CustomersShared.Data.DataEntities
 {
@@ -37,26 +36,21 @@ namespace CustomersShared.Data.DataEntities
                 return true;
             }
 
-            var newObject = obj as CustomerDataTransferObject;
-            if (obj == null)
+            var customerDTOPassedIn = obj as CustomerDataTransferObject;
+            if (customerDTOPassedIn == null)
             {
                 return false;
             }
 
-            var thisFields = this.GetType().GetTypeInfo().GetFields();
-            var objFields = obj.GetType().GetTypeInfo().GetFields();
-
-            if (thisFields.Length != objFields.Length)
+            if (string.CompareOrdinal(FirstName, customerDTOPassedIn.FirstName) != 0
+                || string.CompareOrdinal(LastName, customerDTOPassedIn.LastName) != 0
+                || string.CompareOrdinal(PhoneNumber, customerDTOPassedIn.PhoneNumber) != 0
+                || string.CompareOrdinal(Address, customerDTOPassedIn.Address) != 0
+                || string.CompareOrdinal(City, customerDTOPassedIn.City) != 0
+                || string.CompareOrdinal(State, customerDTOPassedIn.State) != 0
+                || ZipCode != customerDTOPassedIn.ZipCode)
             {
                 return false;
-            }
-
-            for (int i = 0; i < thisFields.Length; i++)
-            {
-                if (thisFields[i] != objFields[i])
-                {
-                    return false;
-                }
             }
 
             return true;
@@ -66,10 +60,13 @@ namespace CustomersShared.Data.DataEntities
         {
             int result = 0x2D2816FE;
 
-            foreach (var item in this.GetType().GetTypeInfo().GetFields())
-            {
-                result = result * 31 + (item == null ? 0 : item.GetHashCode());
-            }
+            result = result * 31 + (FirstName == null ? 0 : FirstName.GetHashCode());
+            result = result * 31 + (LastName == null ? 0 : LastName.GetHashCode());
+            result = result * 31 + (PhoneNumber == null ? 0 : PhoneNumber.GetHashCode());
+            result = result * 31 + (Address == null ? 0 : Address.GetHashCode());
+            result = result * 31 + (City == null ? 0 : City.GetHashCode());
+            result = result * 31 + (State == null ? 0 : State.GetHashCode());
+            result = result * 31 + (ZipCode == 0 ? 0 : ZipCode.GetHashCode());
 
             return result;
         }

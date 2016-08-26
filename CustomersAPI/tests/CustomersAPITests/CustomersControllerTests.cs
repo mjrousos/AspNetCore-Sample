@@ -9,6 +9,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using System.Resources;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace CustomerAPI.Controllers.Tests
@@ -89,9 +90,9 @@ namespace CustomerAPI.Controllers.Tests
             }
         }
 
-        //Test Post(CustomerEntity) method
+        //Test PostAsync(CustomerEntity) method
         [Fact]
-        public void PostWithNullCustomerInfoReturnsBadRequest()
+        public async Task PostAsyncWithNullCustomerInfoReturnsBadRequest()
         {
             using (var customersDataProvider = CreateCustomersDataProvider())
             {
@@ -99,25 +100,7 @@ namespace CustomerAPI.Controllers.Tests
                 var customersController = CreateTestCustomersController(customersDataProvider);
 
                 //act
-                var result = customersController.Post(null);
-
-                //assert
-                Assert.Equal(CustomerInfoInvalidErrorText, result.Value);
-                Assert.Equal(StatusCodes.Status400BadRequest, result.StatusCode);
-            }
-        }
-
-        //Test Post(CustomerEntity) method
-        [Fact]
-        public void PostWithInvalidCustomerInfoReturnsBadRequest()
-        {
-            using (var customersDataProvider = CreateCustomersDataProvider())
-            {
-                //arrange
-                var customersController = CreateTestCustomersController(customersDataProvider);
-
-                //act
-                var result = customersController.Post(new CustomerDataTransferObject());
+                var result = await customersController.PostAsync(null);
 
                 //assert
                 Assert.Equal(CustomerInfoInvalidErrorText, result.Value);
@@ -126,7 +109,24 @@ namespace CustomerAPI.Controllers.Tests
         }
 
         [Fact]
-        public void PostWithValidCustomerInfoAddsCustomerAndReturns200OK()
+        public async Task PostAsyncWithInvalidCustomerInfoReturnsBadRequest()
+        {
+            using (var customersDataProvider = CreateCustomersDataProvider())
+            {
+                //arrange
+                var customersController = CreateTestCustomersController(customersDataProvider);
+
+                //act
+                var result = await customersController.PostAsync(new CustomerDataTransferObject());
+
+                //assert
+                Assert.Equal(CustomerInfoInvalidErrorText, result.Value);
+                Assert.Equal(StatusCodes.Status400BadRequest, result.StatusCode);
+            }
+        }
+
+        [Fact]
+        public async Task PostAsyncWithValidCustomerInfoAddsCustomerAndReturns200OK()
         {
             using (var customersDataProvider = CreateCustomersDataProvider())
             {
@@ -140,7 +140,7 @@ namespace CustomerAPI.Controllers.Tests
                 };
 
                 //act
-                var result = (ObjectResult)customersController.Post(newCustomer);
+                var result = ((ObjectResult)await customersController.PostAsync(newCustomer));
 
                 //assert
                 Assert.Equal(StatusCodes.Status200OK, result.StatusCode);
@@ -152,9 +152,9 @@ namespace CustomerAPI.Controllers.Tests
             }
         }
 
-        //Test Put(Guid, CustomerUpdateInfo) Method
+        //Test PutAsync(Guid, CustomerUpdateInfo) Method
         [Fact]
-        public void UpdateExistingCustomerWithBadUpdateInfoReturns400BadRequest()
+        public async Task PutAsyncExistingCustomerWithBadUpdateInfoReturns400BadRequest()
         {
             using (var customersDataProvider = CreateTestCustomerDataProvider(SampleListOfCustomerDataTransferObjects))
             {
@@ -163,7 +163,7 @@ namespace CustomerAPI.Controllers.Tests
 
                 //act
                 var customerEntity = customersDataProvider.GetCustomers().First();
-                var result = customersController.Put(customerEntity.Id, new CustomerDataTransferObject());
+                var result = await customersController.PutAsync(customerEntity.Id, new CustomerDataTransferObject());
 
                 //assert
                 Assert.Equal(StatusCodes.Status400BadRequest, result.StatusCode);
@@ -177,7 +177,7 @@ namespace CustomerAPI.Controllers.Tests
         }
 
         [Fact]
-        public void UpdateNonExistingCustomerReturns404NotFound()
+        public async Task PutAsyncNonExistingCustomerReturns404NotFound()
         {
             using (var customersDataProvider = CreateTestCustomerDataProvider(SampleListOfCustomerDataTransferObjects))
             {
@@ -193,7 +193,7 @@ namespace CustomerAPI.Controllers.Tests
 
                 //act
                 var guid = Guid.NewGuid();
-                var result = customersController.Put(guid, customerUpdateInfo);
+                var result = await customersController.PutAsync(guid, customerUpdateInfo);
 
                 //assert
                 Assert.Equal(StatusCodes.Status404NotFound, result.StatusCode);
@@ -202,7 +202,7 @@ namespace CustomerAPI.Controllers.Tests
         }
 
         [Fact]
-        public void UpdateExistingCustomerInformationUpdatesAndReturns200OK()
+        public async Task PutAsyncExistingCustomerInformationUpdatesAndReturns200OK()
         {
             using (var customersDataProvider = CreateTestCustomerDataProvider(SampleListOfCustomerDataTransferObjects))
             {
@@ -218,7 +218,7 @@ namespace CustomerAPI.Controllers.Tests
 
                 //act
                 var customerToUpdateId = customersDataProvider.GetCustomers().First().Id;
-                customersController.Put(customerToUpdateId, customerUpdateInfo);
+                await customersController.PutAsync(customerToUpdateId, customerUpdateInfo);
 
                 //assert
                 var customerToUpdate = customersController.Get(customerToUpdateId);
@@ -229,9 +229,9 @@ namespace CustomerAPI.Controllers.Tests
             }
         }
 
-        //Test Delete(Guid) Method
+        //Test DeleteAsync(Guid) Method
         [Fact]
-        public void DeleteNonExistingCustomerReturns404NotFound()
+        public async Task DeleteAsyncNonExistingCustomerReturns404NotFound()
         {
             using (var customersDataProvider = CreateTestCustomerDataProvider(SampleListOfCustomerDataTransferObjects))
             {
@@ -240,7 +240,7 @@ namespace CustomerAPI.Controllers.Tests
 
                 //act
                 var guid = Guid.NewGuid();
-                var customerResult = customersController.Delete(guid);
+                var customerResult = await customersController.DeleteAsync(guid);
 
                 //assert
                 Assert.Equal(StatusCodes.Status404NotFound, customerResult.StatusCode);
@@ -249,7 +249,7 @@ namespace CustomerAPI.Controllers.Tests
         }
 
         [Fact]
-        public void DeleteExistingCustomerRemovesCustomerAndReturns200OK()
+        public async Task DeleteAsyncExistingCustomerRemovesCustomerAndReturns200OK()
         {
             using (var customersDataProvider = CreateTestCustomerDataProvider(SampleListOfCustomerDataTransferObjects))
             {
@@ -258,7 +258,7 @@ namespace CustomerAPI.Controllers.Tests
 
                 //act
                 var customerToRemoveId = customersDataProvider.GetCustomers().First().Id;
-                var customerResult = customersController.Delete(customerToRemoveId);
+                var customerResult = await customersController.DeleteAsync(customerToRemoveId);
 
                 //assert
                 Assert.Equal(StatusCodes.Status200OK, customerResult.StatusCode);

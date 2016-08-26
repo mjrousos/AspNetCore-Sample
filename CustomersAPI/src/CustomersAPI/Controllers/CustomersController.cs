@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Resources;
+using System.Threading.Tasks;
 
 namespace CustomerAPI.Controllers
 {
@@ -31,38 +32,40 @@ namespace CustomerAPI.Controllers
         [HttpGet("{id}")]
         public ObjectResult Get(Guid id)
         {
-            CustomerEntity customer;
+            CustomerDataActionResult customerDataActionResult = _customersDataProvider.TryFindCustomer(id);
 
-            if (!_customersDataProvider.TryFindCustomer(id, out customer))
+            if (!customerDataActionResult.IsSuccess)
             {
                 return new NotFoundObjectResult(string.Format(_resourceManager.GetString("CustomerNotFound"), id));
             }
 
-            return Ok(customer);
+            return Ok(customerDataActionResult.CustomerEntity);
         }
 
         // POST api/Customers
         [HttpPost]
-        public ObjectResult Post([FromBody]CustomerDataTransferObject customerDataTransferObject)
+        public async Task<ObjectResult> PostAsync([FromBody]CustomerDataTransferObject customerDataTransferObject)
         {
             if (customerDataTransferObject == null || !customerDataTransferObject.ValidateCustomerDataTransferObject())
             {
                 return BadRequest(_resourceManager.GetString("CustomerInfoInvalid"));
             }
 
-            CustomerEntity customerAdded;
-            if (!_customersDataProvider.TryAddCustomer(customerDataTransferObject, out customerAdded))
+            CustomerDataActionResult customerDataActionResult = 
+                await _customersDataProvider.TryAddCustomerAsync(customerDataTransferObject);
+
+            if (!customerDataActionResult.IsSuccess)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
                                   _resourceManager.GetString("UnexpectedServerError"));
             }
 
-            return Ok(customerAdded);
+            return Ok(customerDataActionResult.CustomerEntity);
         }
 
         // PUT api/Customers/5
         [HttpPut("{id}")]
-        public ObjectResult Put(Guid id, [FromBody]CustomerDataTransferObject customerDataTransferObject)
+        public async Task<ObjectResult> PutAsync(Guid id, [FromBody]CustomerDataTransferObject customerDataTransferObject)
         {
             if (customerDataTransferObject == null || !customerDataTransferObject.ValidateCustomerDataTransferObject())
             {
@@ -74,33 +77,35 @@ namespace CustomerAPI.Controllers
                 return new NotFoundObjectResult(string.Format(_resourceManager.GetString("CustomerNotFound"), id));
             }
 
-            CustomerEntity customerUpdated;
-            if (!_customersDataProvider.TryUpdateCustomer(id, customerDataTransferObject, out customerUpdated))
+            CustomerDataActionResult customerDataActionResult = 
+                    await _customersDataProvider.TryUpdateCustomerAsync(id, customerDataTransferObject);
+
+            if (!customerDataActionResult.IsSuccess)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
                                   _resourceManager.GetString("UnexpectedServerError"));
             }
 
-            return Ok(customerUpdated);
+            return Ok(customerDataActionResult.CustomerEntity);
         }
 
         // DELETE api/Customers/5
         [HttpDelete("{id}")]
-        public ObjectResult Delete(Guid id)
+        public async Task<ObjectResult> DeleteAsync(Guid id)
         {
             if (!_customersDataProvider.CustomerExists(id))
             {
                 return new NotFoundObjectResult(string.Format(_resourceManager.GetString("CustomerNotFound"), id));
             }
 
-            CustomerEntity customerDeleted;
-            if (!_customersDataProvider.TryDeleteCustomer(id, out customerDeleted))
+            CustomerDataActionResult customerDataActionResult = await _customersDataProvider.TryDeleteCustomerAsync(id);
+            if (!customerDataActionResult.IsSuccess)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
                                   _resourceManager.GetString("UnexpectedServerError"));
             }
 
-            return Ok(customerDeleted);
+            return Ok(customerDataActionResult.CustomerEntity);
         }
     }
 }

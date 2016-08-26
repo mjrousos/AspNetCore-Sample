@@ -2,6 +2,7 @@
 using CustomersShared.Data.DataEntities;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace CustomerAPITests.CustomerDataProviders
@@ -85,29 +86,33 @@ namespace CustomerAPITests.CustomerDataProviders
             }
         }
 
-        //Test AddCustomer(customerDataTransferObject)
+        //Test AddCustomerAsync(customerDataTransferObject)
         [Fact]
-        public void AddCustomerWithNullCustomerInfoThrowsArgumentNullException()
+        public async Task AddCustomerAsyncWithNullCustomerInfoThrowsArgumentNullException()
         {
             using (var customersDataProvider = CreateCustomersDataProvider())
             {
                 CustomerDataTransferObject customerInfo = null;
-                Assert.Throws<ArgumentNullException>(() => customersDataProvider.AddCustomer(customerInfo));
+
+                await Assert.ThrowsAsync<ArgumentNullException>(async () =>
+                    await customersDataProvider.AddCustomerAsync(customerInfo));
             }
         }
 
         [Fact]
-        public void AddCustomerWithInvalidCustomerInfoThrowsArgumentException()
+        public async Task AddCustomerAsyncWithInvalidCustomerInfoThrowsArgumentException()
         {
             using (var customersDataProvider = CreateCustomersDataProvider())
             {
                 CustomerDataTransferObject customerInfo = new CustomerDataTransferObject();
-                Assert.Throws<ArgumentException>(() => customersDataProvider.AddCustomer(customerInfo));
+
+                await Assert.ThrowsAsync<ArgumentException>(async () =>
+                    await customersDataProvider.AddCustomerAsync(customerInfo));
             }
         }
 
         [Fact]
-        public void AddCustomerWithValidCustomerInfoAddsCustomer()
+        public async Task AddCustomerAsyncWithValidCustomerInfoAddsCustomer()
         {
             using (var customersDataProvider = CreateCustomersDataProvider())
             {
@@ -120,7 +125,7 @@ namespace CustomerAPITests.CustomerDataProviders
                 };
 
                 //act
-                var result = customersDataProvider.AddCustomer(customerInfo);
+                var result = await customersDataProvider.AddCustomerAsync(customerInfo);
 
                 //assert
                 Assert.NotEqual(Guid.Empty, result.Id);
@@ -129,16 +134,16 @@ namespace CustomerAPITests.CustomerDataProviders
             }
         }
 
-        //Test UpdateCustomer(Guid, CustomerDataTransferObject) Method
+        //Test UpdateCustomerAsync(Guid, CustomerDataTransferObject) Method
         [Fact]
-        public void UpdateExistingCustomerWithBadUpdateInfoThrowsArgumentException()
+        public async Task UpdateAsyncExistingCustomerWithBadUpdateInfoThrowsArgumentException()
         {
             using (var customersDataProvider = CreateTestCustomerDataProvider(SampleListOfCustomerDataTransferObjects))
             {
                 //act
                 var customerEntity = customersDataProvider.GetCustomers().First();
-                Assert.Throws<ArgumentException>(() =>
-                        customersDataProvider.UpdateCustomer(customerEntity.Id, new CustomerDataTransferObject()));
+                await Assert.ThrowsAsync<ArgumentException>(async () => await
+                        customersDataProvider.UpdateCustomerAsync(customerEntity.Id, new CustomerDataTransferObject()));
 
                 //assert
                 var getCustomerResult = customersDataProvider.FindCustomer(customerEntity.Id);
@@ -148,7 +153,7 @@ namespace CustomerAPITests.CustomerDataProviders
         }
 
         [Fact]
-        public void UpdateNonExistingCustomerThrowsInvalidOperationException()
+        public async Task UpdateAsyncNonExistingCustomerThrowsInvalidOperationException()
         {
             using (var customersDataProvider = CreateTestCustomerDataProvider(SampleListOfCustomerDataTransferObjects))
             {
@@ -163,13 +168,13 @@ namespace CustomerAPITests.CustomerDataProviders
                 var guid = Guid.NewGuid();
 
                 //assert
-                Assert.Throws<InvalidOperationException>(() =>
-                    customersDataProvider.UpdateCustomer(guid, customerDataTransferObject));
+                await Assert.ThrowsAsync<InvalidOperationException>(async () => await
+                    customersDataProvider.UpdateCustomerAsync(guid, customerDataTransferObject));
             }
         }
 
         [Fact]
-        public void UpdateExistingCustomerInformationUpdatesAndReturns200OK()
+        public async Task UpdateAsyncExistingCustomerInformationUpdatesAndReturns200OK()
         {
             using (var customersDataProvider = CreateTestCustomerDataProvider(SampleListOfCustomerDataTransferObjects))
             {
@@ -183,8 +188,8 @@ namespace CustomerAPITests.CustomerDataProviders
 
                 //act
                 var customerToUpdateId = customersDataProvider.GetCustomers().First().Id;
-                var customerUpdated = customersDataProvider.UpdateCustomer(customerToUpdateId,
-                                                                           customerDataTransferObject);
+                var customerUpdated = await customersDataProvider.UpdateCustomerAsync(customerToUpdateId,
+                                                                                      customerDataTransferObject);
 
                 //assert
                 var customerToUpdate = customersDataProvider.FindCustomer(customerToUpdateId);
@@ -194,26 +199,27 @@ namespace CustomerAPITests.CustomerDataProviders
             }
         }
 
-        //Test Delete(Guid) Method
+        //Test DeleteAsync(Guid) Method
         [Fact]
-        public void DeleteNonExistingCustomerThrowsInvalidOperationException()
+        public async Task DeleteAsyncNonExistingCustomerThrowsInvalidOperationException()
         {
             using (var customersDataProvider = CreateTestCustomerDataProvider(SampleListOfCustomerDataTransferObjects))
             {
                 //act
                 var guid = Guid.NewGuid();
-                Assert.Throws<InvalidOperationException>(() => customersDataProvider.DeleteCustomer(guid));
+                await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                    await customersDataProvider.DeleteCustomerAsync(guid));
             }
         }
 
         [Fact]
-        public void DeleteExistingCustomerRemovesCustomerAndReturnsCustomerEntity()
+        public async Task DeleteAsyncExistingCustomerRemovesCustomerAndReturnsCustomerEntity()
         {
             using (var customersDataProvider = CreateTestCustomerDataProvider(SampleListOfCustomerDataTransferObjects))
             {
                 //act
                 var customerToRemoveId = customersDataProvider.GetCustomers().First().Id;
-                var customerResult = customersDataProvider.DeleteCustomer(customerToRemoveId);
+                var customerResult = await customersDataProvider.DeleteCustomerAsync(customerToRemoveId);
 
                 //assert
                 Assert.NotNull(customerResult);
@@ -230,11 +236,13 @@ namespace CustomerAPITests.CustomerDataProviders
             {
                 //arrange
                 var id = Guid.NewGuid();
-                CustomerEntity customerResult;
+
+                //act
+                CustomerDataActionResult customerDataActionResult = customersDataProvider.TryFindCustomer(id);
 
                 //assert
-                Assert.False(customersDataProvider.TryFindCustomer(id, out customerResult));
-                Assert.Null(customerResult);
+                Assert.False(customerDataActionResult.IsSuccess);
+                Assert.Null(customerDataActionResult.CustomerEntity);
             }
         }
 
@@ -242,56 +250,57 @@ namespace CustomerAPITests.CustomerDataProviders
         {
             using (var customersDataProvider = CreateTestCustomerDataProvider(SampleListOfCustomerDataTransferObjects))
             {
-                //act
                 foreach (var customer in customersDataProvider.GetCustomers())
                 {
-                    CustomerEntity customerResult;
+                    //act
+                    CustomerDataActionResult customerDataActionResult = customersDataProvider.TryFindCustomer(customer.Id);
 
                     //assert
-                    Assert.True(customersDataProvider.TryFindCustomer(customer.Id, out customerResult));
-                    Assert.Equal(customer.Id, (customerResult.Id));
+                    Assert.True(customerDataActionResult.IsSuccess);
+                    Assert.Equal(customer.Id, customerDataActionResult.CustomerEntity.Id);
                 }
             }
         }
 
-        //Test TryAddCustomer(customerDataTransferObject)
+        //Test TryAddCustomerAsync(customerDataTransferObject)
         [Fact]
-        public void TryAddCustomerWithNullCustomerInfoReturnsFalse()
+        public async Task TryAddCustomerAsyncWithNullCustomerInfoReturnsFalse()
         {
             using (var customersDataProvider = CreateCustomersDataProvider())
             {
                 //arrange
                 CustomerDataTransferObject customerInfo = null;
-                CustomerEntity result;
 
                 //assert
-                Assert.False(customersDataProvider.TryAddCustomer(customerInfo, out result));
-                Assert.Null(result);
+                CustomerDataActionResult result = await customersDataProvider.TryAddCustomerAsync(customerInfo);
+                Assert.False(result.IsSuccess);
+                Assert.Null(result.CustomerEntity);
             }
         }
 
         [Fact]
-        public void TryAddCustomerWithInvalidCustomerInfoReturnsFalse()
+        public async Task TryAddCustomerAsyncWithInvalidCustomerInfoReturnsFalse()
         {
             using (var customersDataProvider = CreateCustomersDataProvider())
             {
                 //arrange
                 CustomerDataTransferObject customerDataTransferObject = new CustomerDataTransferObject();
-                CustomerEntity result;
 
                 //Assert
-                Assert.False(customersDataProvider.TryAddCustomer(customerDataTransferObject, out result));
-                Assert.Null(result);
+                CustomerDataActionResult result = await customersDataProvider
+                    .TryAddCustomerAsync(customerDataTransferObject);
+
+                Assert.False(result.IsSuccess);
+                Assert.Null(result.CustomerEntity);
             }
         }
 
         [Fact]
-        public void TryAddCustomerWithValidCustomerInfoAddsCustomer()
+        public async Task TryAddCustomerAsyncWithValidCustomerInfoAddsCustomer()
         {
             using (var customersDataProvider = CreateCustomersDataProvider())
             {
                 //arrange
-                CustomerEntity result;
                 var customerInfo = new CustomerDataTransferObject
                 {
                     FirstName = "Jon",
@@ -299,29 +308,34 @@ namespace CustomerAPITests.CustomerDataProviders
                     PhoneNumber = "555-555-5555"
                 };
 
+                //act
+                CustomerDataActionResult result = await customersDataProvider.TryAddCustomerAsync(customerInfo);
+
                 //assert
-                Assert.True(customersDataProvider.TryAddCustomer(customerInfo, out result));
-                Assert.NotEqual(Guid.Empty, result.Id);
-                Assert.Equal(customerInfo.FirstName, result.FirstName);
-                Assert.Equal(customerInfo.LastName, result.LastName);
+
+                Assert.True(result.IsSuccess);
+                Assert.NotEqual(Guid.Empty, result.CustomerEntity.Id);
+                Assert.Equal(customerInfo.FirstName, result.CustomerEntity.FirstName);
+                Assert.Equal(customerInfo.LastName, result.CustomerEntity.LastName);
             }
         }
 
         //Test TryUpdateCustomer(Guid, CustomerDataTransferObject) Method
         [Fact]
-        public void TryUpdateExistingCustomerWithBadUpdateInfoReturnsFalse()
+        public async Task TryUpdateCustomerAsyncExistingCustomerWithBadUpdateInfoReturnsFalse()
         {
             using (var customersDataProvider = CreateTestCustomerDataProvider(SampleListOfCustomerDataTransferObjects))
             {
-                //act
+                //arrange
                 var customerEntity = customersDataProvider.GetCustomers().First();
-                CustomerEntity updatedCustomerEntity;
-                Assert.False(customersDataProvider.TryUpdateCustomer(customerEntity.Id, 
-                                                                     new CustomerDataTransferObject(),
-                                                                     out updatedCustomerEntity));
 
-                //assert
-                Assert.Null(updatedCustomerEntity);
+                //act
+                CustomerDataActionResult customerDataActionResult =
+                    await customersDataProvider.TryUpdateCustomerAsync(customerEntity.Id, new CustomerDataTransferObject());
+
+                Assert.False(customerDataActionResult.IsSuccess);
+                Assert.Null(customerDataActionResult.CustomerEntity);
+
                 var getCustomerResult = customersDataProvider.FindCustomer(customerEntity.Id);
                 Assert.Equal(customerEntity.FirstName, getCustomerResult.FirstName);
                 Assert.Equal(customerEntity.LastName, getCustomerResult.LastName);
@@ -329,7 +343,7 @@ namespace CustomerAPITests.CustomerDataProviders
         }
 
         [Fact]
-        public void UpdateNonExistingCustomerReturnsFalse()
+        public async Task TryUpdateCustomerAsyncNonExistingCustomerReturnsFalse()
         {
             using (var customersDataProvider = CreateTestCustomerDataProvider(SampleListOfCustomerDataTransferObjects))
             {
@@ -343,21 +357,23 @@ namespace CustomerAPITests.CustomerDataProviders
 
                 var guid = Guid.NewGuid();
 
+                //act
+                CustomerDataActionResult customerDataActionResult =
+                    await customersDataProvider.TryUpdateCustomerAsync(guid, customerDataTransferObject);
+
                 //assert
-                CustomerEntity addedCustomerEntity;
-                Assert.False(customersDataProvider.TryUpdateCustomer(guid, 
-                                                                     customerDataTransferObject,
-                                                                     out addedCustomerEntity));
-                Assert.Null(addedCustomerEntity);
+                Assert.False(customerDataActionResult.IsSuccess);
+                Assert.Null(customerDataActionResult.CustomerEntity);
             }
         }
 
         [Fact]
-        public void UpdateExistingCustomerInformationUpdatesAndReturnsTrue()
+        public async Task TryUpdateCustomerAsyncExistingCustomerInformationUpdatesAndReturnsTrue()
         {
             using (var customersDataProvider = CreateTestCustomerDataProvider(SampleListOfCustomerDataTransferObjects))
             {
                 //arrange
+                var customerToUpdateId = customersDataProvider.GetCustomers().First().Id;
                 var customerDataTransferObject = new CustomerDataTransferObject
                 {
                     FirstName = "Joe",
@@ -366,16 +382,13 @@ namespace CustomerAPITests.CustomerDataProviders
                 };
 
                 //act
-                var customerToUpdateId = customersDataProvider.GetCustomers().First().Id;
-                CustomerEntity customerUpdated;
-                Assert.True(customersDataProvider.TryUpdateCustomer(customerToUpdateId,
-                                                                 customerDataTransferObject,
-                                                                 out customerUpdated));
+                CustomerDataActionResult customerDataActionResult =
+                    await customersDataProvider.TryUpdateCustomerAsync(customerToUpdateId, customerDataTransferObject);
 
                 //assert
-                Assert.NotNull(customerUpdated);
-                Assert.Equal("Joe", customerUpdated.FirstName);
-                Assert.Equal("Smith", customerUpdated.LastName);
+                Assert.True(customerDataActionResult.IsSuccess);
+                Assert.Equal("Joe", customerDataActionResult.CustomerEntity.FirstName);
+                Assert.Equal("Smith", customerDataActionResult.CustomerEntity.LastName);
 
                 //assert
                 var customerToUpdate = customersDataProvider.FindCustomer(customerToUpdateId);
@@ -385,33 +398,40 @@ namespace CustomerAPITests.CustomerDataProviders
             }
         }
 
-        //Test Delete(Guid) Method
+        //Test TryDeleteCustomerAsync(Guid) Method
         [Fact]
-        public void TryDeleteNonExistingCustomerReturnsFalse()
+        public async Task TryDeleteCustomerAsyncNonExistingCustomerReturnsFalse()
         {
             using (var customersDataProvider = CreateTestCustomerDataProvider(SampleListOfCustomerDataTransferObjects))
             {
-                //act
+                //arrange
                 var guid = Guid.NewGuid();
-                CustomerEntity customerResult;
-                Assert.False(customersDataProvider.TryDeleteCustomer(guid, out customerResult));
-                Assert.Null(customerResult);
+
+                //act
+                CustomerDataActionResult customerDataActionResult = 
+                    await customersDataProvider.TryDeleteCustomerAsync(guid);
+
+                //assert
+                Assert.False(customerDataActionResult.IsSuccess);
+                Assert.Null(customerDataActionResult.CustomerEntity);
             }
         }
 
         [Fact]
-        public void TryDeleteExistingCustomerRemovesCustomerAndReturnsCustomerEntity()
+        public async Task TryDeleteCustomerAsyncExistingCustomerRemovesCustomerAndReturnsCustomerEntity()
         {
             using (var customersDataProvider = CreateTestCustomerDataProvider(SampleListOfCustomerDataTransferObjects))
             {
-                //act
+                //arrange
                 var customerToRemoveId = customersDataProvider.GetCustomers().First().Id;
-                CustomerEntity customerResult;
-                Assert.True(customersDataProvider.TryDeleteCustomer(customerToRemoveId, out customerResult));
+
+                //act
+                CustomerDataActionResult customerDataActionResult =
+                    await customersDataProvider.TryDeleteCustomerAsync(customerToRemoveId);
 
                 //assert
-                Assert.NotNull(customerResult);
-                Assert.Equal(customerToRemoveId, customerResult.Id);
+                Assert.True(customerDataActionResult.IsSuccess);
+                Assert.Equal(customerToRemoveId, customerDataActionResult.CustomerEntity.Id);
                 Assert.False(customersDataProvider.CustomerExists(customerToRemoveId));
             }
         }

@@ -4,12 +4,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace CustomerAPI.Data
 {
     public class EFCustomersDataProvider : DbContext, ICustomersDataProvider
     {
-        private DbSet<CustomerEntity> Customers { get; set; }
+        private DbSet<CustomerEntity> _customers { get; set; }
+        private readonly CustomerDataActionResult _failedCustomerDataActionResult = new CustomerDataActionResult(false, null);
 
         public EFCustomersDataProvider(DbContextOptions options) : base(options)
         {
@@ -20,7 +22,7 @@ namespace CustomerAPI.Data
         /// </summary>
         public IEnumerable<CustomerEntity> GetCustomers()
         {
-            return Customers;
+            return _customers;
         }
 
         /// <summary>
@@ -28,13 +30,14 @@ namespace CustomerAPI.Data
         /// </summary>
         public bool CustomerExists(Guid id)
         {
-            return (Customers.FirstOrDefault(c => c.Id == id) != null);
+            //TODO: Use DBSet.FindAsync when EF 1.1 comes out
+            return (_customers.FirstOrDefault(c => c.Id == id) != null);
         }
 
         /// <summary>
         /// Adds a customer using the customerDataTransferObject
         /// </summary>
-        public CustomerEntity AddCustomer(CustomerDataTransferObject customerDataTransferObject)
+        public async Task<CustomerEntity> AddCustomerAsync(CustomerDataTransferObject customerDataTransferObject)
         {
             if (customerDataTransferObject == null)
             {
@@ -48,28 +51,26 @@ namespace CustomerAPI.Data
 
             var newCustomerEntity = new CustomerEntity();
             UpdateCustomerInfo(newCustomerEntity, customerDataTransferObject);
-            var customerEntityAdded = Customers.Add(newCustomerEntity);
+            var customerEntityAdded = _customers.Add(newCustomerEntity);
 
-            if (customerEntityAdded?.Entity != null)
-            {
-                this.SaveChanges();
-                return customerEntityAdded.Entity;
-            }
-            else
+            if (customerEntityAdded?.Entity == null)
             {
                 return null;
             }
+
+            await this.SaveChangesAsync();
+            return customerEntityAdded.Entity;
         }
 
         /// <summary>
         /// Deletes a customer from the customers list
         /// </summary>
-        public CustomerEntity DeleteCustomer(Guid id)
+        public async Task<CustomerEntity> DeleteCustomerAsync(Guid id)
         {
-            var customerEntity = Customers.First(c => c.Id == id);
-            var customerRemoved = Customers.Remove(customerEntity);
+            var customerEntity = _customers.First(c => c.Id == id);
+            var customerRemoved = _customers.Remove(customerEntity);
 
-            this.SaveChanges();
+            await this.SaveChangesAsync();
             return customerRemoved.Entity;
         }
 
@@ -78,139 +79,118 @@ namespace CustomerAPI.Data
         /// </summary>
         public CustomerEntity FindCustomer(Guid id)
         {
-            //TODO: When EF 1.1 comes in use Customers.Find instead of Customers.First
-            return Customers.First(c => c.Id == id);
+            //TODO: When EF 1.1 comes in change this to use Customers.FindAsync method instead of Customers.First
+            return _customers.First(c => c.Id == id);
         }
 
         /// <summary>
         /// Updates an existing customer's information to the customerDataTransferObject
         /// </summary>
-        public CustomerEntity UpdateCustomer(Guid id, CustomerDataTransferObject customerDataTransferObject)
+        public async Task<CustomerEntity> UpdateCustomerAsync(Guid id, CustomerDataTransferObject customerDataTransferObject)
         {
             var customerEntity = FindCustomer(id);
-
             UpdateCustomerInfo(customerEntity, customerDataTransferObject);
-            this.SaveChanges();
 
+            await this.SaveChangesAsync();
             return customerEntity;
         }
 
         /// <summary>
         /// Tries to add a customer. If the customer is added, then returns true
         /// </summary>
-        public bool TryAddCustomer(CustomerDataTransferObject customerDataTransferObject,
-                                   out CustomerEntity customerEntity)
+        public async Task<CustomerDataActionResult> TryAddCustomerAsync(CustomerDataTransferObject customerDataTransferObject)
         {
-            if (customerDataTransferObject == null)
-            {
-                customerEntity = null;
-                return false;
-            }
-
-            if (!customerDataTransferObject.ValidateCustomerDataTransferObject())
-            {
-                customerEntity = null;
-                return false;
-            }
-
             try
             {
-                customerEntity = AddCustomer(customerDataTransferObject);
+                var customerEntity = await AddCustomerAsync(customerDataTransferObject);
 
-                if (customerEntity != null)
+                if (customerEntity == null)
                 {
-                    this.SaveChanges();
-                    return true;
+                    return _failedCustomerDataActionResult;
                 }
-                else
-                {
-                    customerEntity = null;
-                    return false;
-                }
+
+                return new CustomerDataActionResult(true, customerEntity);
             }
             catch
             {
-                customerEntity = null;
-                return false;
+                return _failedCustomerDataActionResult;
             }
         }
 
         /// <summary>
         /// Tries to delete a customer from the customer list
         /// </summary>
-        public bool TryDeleteCustomer(Guid id, out CustomerEntity customerEntity)
+        public async Task<CustomerDataActionResult> TryDeleteCustomerAsync(Guid id)
         {
-            CustomerEntity customerToRemove;
-            if (!TryFindCustomer(id, out customerToRemove))
+            if (!CustomerExists(id))
             {
-                customerEntity = null;
-                return false;
+                return _failedCustomerDataActionResult;
             }
 
             try
             {
-                var result = Customers.Remove(customerToRemove);
+                var customerEntity = await DeleteCustomerAsync(id);
 
-                if (result?.Entity != null)
+                if (customerEntity == null)
                 {
-                    this.SaveChanges();
-                    customerEntity = result.Entity;
-                    return true;
+                    return _failedCustomerDataActionResult;
                 }
-                else
-                {
-                    customerEntity = null;
-                    return false;
-                }
+
+                await this.SaveChangesAsync();
+                return new CustomerDataActionResult(true, customerEntity);
             }
             catch
             {
-                customerEntity = null;
-                return false;
+                return _failedCustomerDataActionResult;
             }
         }
 
         /// <summary>
         /// Tries to find a customer by ID. If the customer Id is not found then returns false
         /// </summary>
-        public bool TryFindCustomer(Guid id, out CustomerEntity customerEntity)
+        public CustomerDataActionResult TryFindCustomer(Guid id)
         {
             try
             {
-                customerEntity = Customers.First(c => c.Id == id);
-                return customerEntity != null;
+                var customerEntity = FindCustomer(id);
+
+                if (customerEntity == null)
+                {
+                    return _failedCustomerDataActionResult;
+                }
+
+                return new CustomerDataActionResult(true, customerEntity);
             }
             catch
             {
-                customerEntity = null;
-                return false;
+                return _failedCustomerDataActionResult;
             }
         }
 
         /// <summary>
         /// Tries to update an existing customer with the customerDataTransferObject
         /// </summary>
-        public bool TryUpdateCustomer(Guid id,
-                                      CustomerDataTransferObject customerDataTransferObject,
-                                      out CustomerEntity customerEntity)
+        public async Task<CustomerDataActionResult> TryUpdateCustomerAsync(Guid id, CustomerDataTransferObject customerDataTransferObject)
         {
-            if (!TryFindCustomer(id, out customerEntity))
+            if (!CustomerExists(id))
             {
-                customerEntity = null;
-                return false;
+                return _failedCustomerDataActionResult;
             };
 
             try
             {
-                UpdateCustomerInfo(customerEntity, customerDataTransferObject);
-                this.SaveChanges();
+                var customerEntity = await UpdateCustomerAsync(id, customerDataTransferObject);
 
-                return true;
+                if (customerEntity == null)
+                {
+                    return _failedCustomerDataActionResult;
+                }
+
+                return new CustomerDataActionResult(true, customerEntity);
             }
             catch
             {
-                customerEntity = null;
-                return false;
+                return _failedCustomerDataActionResult;
             }
         }
 
