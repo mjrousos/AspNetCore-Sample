@@ -13,7 +13,6 @@ namespace CustomerAPI
         {
             var host = new WebHostBuilder()
                 .UseKestrel()
-                .UseUrls("http://0.0.0.0:6000")
                 // Services can be registered with the ASP.NET Core DI container at IWebHost build-time
                 // by calling ConfigureServices on the WebHostBuilder.
                 //
@@ -25,6 +24,7 @@ namespace CustomerAPI
                     serviceCollection.AddSingleton(new ResourceManager("CustomersAPI.Resources.StringResources",
                                                       typeof(Startup).GetTypeInfo().Assembly));
                 })
+                .UseUrls("http://+:6000")
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseIISIntegration()
                 .UseStartup<Startup>()
