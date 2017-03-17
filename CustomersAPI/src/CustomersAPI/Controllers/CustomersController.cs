@@ -15,6 +15,10 @@ namespace CustomerAPI.Controllers
         private readonly ICustomersDataProvider _customersDataProvider;
         private readonly ResourceManager _resourceManager;
 
+        // ASP.NET Core will automatically populate controller constructor arguments by resolving
+        // services from the DI container. If needed, those objects will be created by calling constructors
+        // whose own arguments will be provided by DI, and so on recursively until the whole object graph
+        // needed has been constructed.
         public CustomersController(ICustomersDataProvider customersDataProvider, ResourceManager resourceManager)
         {
             _customersDataProvider = customersDataProvider;
@@ -36,7 +40,11 @@ namespace CustomerAPI.Controllers
 
             if (!customerDataActionResult.IsSuccess)
             {
-                return new NotFoundObjectResult(string.Format(_resourceManager.GetString("CustomerNotFound"), id));
+                // HttpContext.RequestService can be used to resolve depdency-injected services
+                // But receiving them via constructor injection is preferred.
+                var resourceManager = HttpContext.RequestServices.GetService(typeof(ResourceManager)) as ResourceManager;
+
+                return new NotFoundObjectResult(string.Format(resourceManager.GetString("CustomerNotFound"), id));
             }
 
             return Ok(customerDataActionResult.CustomerEntity);
@@ -44,11 +52,13 @@ namespace CustomerAPI.Controllers
 
         // POST api/Customers
         [HttpPost]
-        public async Task<ObjectResult> PostAsync([FromBody]CustomerDataTransferObject customerDataTransferObject)
+        public async Task<ObjectResult> PostAsync([FromBody]CustomerDataTransferObject customerDataTransferObject, 
+                                                  // Another way of requesting services from DI is [FromServices]
+                                                  [FromServices] ResourceManager resManager)
         {
             if (customerDataTransferObject == null || !customerDataTransferObject.ValidateCustomerDataTransferObject())
             {
-                return BadRequest(_resourceManager.GetString("CustomerInfoInvalid"));
+                return BadRequest(resManager.GetString("CustomerInfoInvalid"));
             }
 
             CustomerDataActionResult customerDataActionResult = 
@@ -57,7 +67,7 @@ namespace CustomerAPI.Controllers
             if (!customerDataActionResult.IsSuccess)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                                  _resourceManager.GetString("UnexpectedServerError"));
+                                  resManager.GetString("UnexpectedServerError"));
             }
 
             return Ok(customerDataActionResult.CustomerEntity);
