@@ -18,7 +18,10 @@
     "Microsoft.EntityFrameworkCore.InMemory": "1.0.0",
     "Swashbuckle": "6.0.0-beta901",
     "Swashbuckle.SwaggerUi": "6.0.0-beta901",
-    "CustomersDataModels": "1.0.0"
+    "CustomersDataModels": {
+      "target": "project",
+      "version": "1.0.0"
+    }
   },
 
   "tools": {
