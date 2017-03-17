@@ -10,11 +10,16 @@ using System.Globalization;
 using Microsoft.AspNetCore.Localization;
 using System.Resources;
 using System.Reflection;
+using Autofac;
+using System;
+using Autofac.Extensions.DependencyInjection;
 
 namespace CustomerAPI
 {
     public class Startup
     {
+        public IContainer AutofacContainer;
+
         public Startup(IHostingEnvironment env)
         {
             /* This section adds in configuration from different configuration sources including
@@ -32,7 +37,11 @@ namespace CustomerAPI
 
         // This method gets called by the runtime. 
         // Use this method to add services to the dependency injection container.
-        public void ConfigureServices(IServiceCollection services)
+        //
+        // If using the built-in ASP.NET Core dependency injection container, this
+        // method can return void. Otherwise, it should return an IServiceProvider containing
+        // the non-default container used.
+        public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             // Add framework services.
             services.AddMvc();
@@ -52,11 +61,26 @@ namespace CustomerAPI
             });
 
             // Add Entity Framework Customers data provider
-            services.AddSingleton<ICustomersDataProvider>(CreateInMemoryCustomersDataProvider());
+            // This could be added directly to services, but in this sample we're adding it
+            // to the Autofac container in order to demonstrate that interaction.
+            //services.AddSingleton<ICustomersDataProvider>(CreateInMemoryCustomersDataProvider());
 
-            //Add ResourceManager singleton
-            services.AddSingleton(new ResourceManager("CustomersAPI.Resources.StringResources",
-                                                      typeof(Startup).GetTypeInfo().Assembly));
+            // Setup Autofac integration
+            var builder = new ContainerBuilder();
+
+            // Autofac registration calls can go here.
+            builder.RegisterInstance(CreateInMemoryCustomersDataProvider());
+            //// builder.RegisterModule(new MyAutofacModule);
+
+            // Adds ASP.NET Core-registered services to the Autofac container
+            builder.Populate(services);
+
+            // Storing the container in a field so that other components can make use of it.
+            // In many scenarios, this isn't necessary. builder.Build() can often be returned directly.
+            AutofacContainer = builder.Build();
+
+            // Return the DI container to be used by this web application.
+            return new AutofacServiceProvider(AutofacContainer);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

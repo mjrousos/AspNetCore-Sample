@@ -16,8 +16,13 @@
     "Microsoft.Extensions.Options.ConfigurationExtensions": "1.0.0",
     "Microsoft.EntityFrameworkCore": "1.0.0",
     "Microsoft.EntityFrameworkCore.InMemory": "1.0.0",
+
     "Swashbuckle": "6.0.0-beta901",
     "Swashbuckle.SwaggerUi": "6.0.0-beta901",
+
+    "Autofac": "4.4.0",
+    "Autofac.Extensions.DependencyInjection": "4.0.0",
+
     "CustomersDataModels": "1.0.0"
   },
 
