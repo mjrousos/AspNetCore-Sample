@@ -30,7 +30,8 @@ namespace CustomerAPI
 
         public IConfigurationRoot Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
+        // This method gets called by the runtime. 
+        // Use this method to add services to the dependency injection container.
         public void ConfigureServices(IServiceCollection services)
         {
             // Add framework services.
@@ -51,7 +52,7 @@ namespace CustomerAPI
             });
 
             // Add Entity Framework Customers data provider
-            services.AddSingleton<ICustomersDataProvider>(CreateCustomersDataProvider());
+            services.AddSingleton<ICustomersDataProvider>(CreateInMemoryCustomersDataProvider());
 
             //Add ResourceManager singleton
             services.AddSingleton(new ResourceManager("CustomersAPI.Resources.StringResources",
@@ -92,7 +93,7 @@ namespace CustomerAPI
         /// <summary>
         /// Creates a new Customers data provider with the options to create a new in memory database
         /// </summary>
-        private ICustomersDataProvider CreateCustomersDataProvider()
+        private ICustomersDataProvider CreateInMemoryCustomersDataProvider()
         {
             // Create a fresh service provider, and therefore a fresh 
             // InMemory database instance.
