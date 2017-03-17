@@ -61,16 +61,19 @@ namespace CustomerAPI
             });
 
             // Add Entity Framework Customers data provider
+            services.AddDbContext<EFCustomersDataProvider>(options =>
+                options.UseInMemoryDatabase());
+
             // This could be added directly to services, but in this sample we're adding it
             // to the Autofac container in order to demonstrate that interaction.
-            //services.AddSingleton<ICustomersDataProvider>(CreateInMemoryCustomersDataProvider());
+            //services.AddScoped<ICustomersDataProvider, EFCustomersDataProvider>();
 
             // Setup Autofac integration
             var builder = new ContainerBuilder();
 
             // Autofac registration calls can go here.
-            builder.RegisterInstance(CreateInMemoryCustomersDataProvider());
-            //// builder.RegisterModule(new MyAutofacModule);
+            builder.RegisterType<EFCustomersDataProvider>().As<ICustomersDataProvider>();
+            // builder.RegisterModule(new MyAutofacModule);
 
             // Adds ASP.NET Core-registered services to the Autofac container
             builder.Populate(services);
@@ -113,26 +116,5 @@ namespace CustomerAPI
             app.UseSwagger();
             app.UseSwaggerUi();
         }
-
-        /// <summary>
-        /// Creates a new Customers data provider with the options to create a new in memory database
-        /// </summary>
-        private ICustomersDataProvider CreateInMemoryCustomersDataProvider()
-        {
-            // Create a fresh service provider, and therefore a fresh 
-            // InMemory database instance.
-            var serviceProvider = new ServiceCollection()
-                .AddEntityFrameworkInMemoryDatabase()
-                .BuildServiceProvider();
-
-            // Create a new options instance telling the context to use an
-            // InMemory database and the new service provider.
-            var builder = new DbContextOptionsBuilder<EFCustomersDataProvider>();
-            builder.UseInMemoryDatabase()
-                   .UseInternalServiceProvider(serviceProvider);
-
-            return new EFCustomersDataProvider(builder.Options);
-        }
-
     }
 }
