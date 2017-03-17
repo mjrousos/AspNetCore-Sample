@@ -66,13 +66,13 @@ namespace CustomerAPI
 
             // This could be added directly to services, but in this sample we're adding it
             // to the Autofac container in order to demonstrate that interaction.
-            //services.AddScoped<ICustomersDataProvider, EFCustomersDataProvider>();
+            // services.AddScoped<ICustomersDataProvider, EFCustomersDataProvider>();
 
             // Setup Autofac integration
             var builder = new ContainerBuilder();
 
             // Autofac registration calls can go here.
-            builder.RegisterType<EFCustomersDataProvider>().As<ICustomersDataProvider>();
+            builder.RegisterType<EFCustomersDataProvider>().As<ICustomersDataProvider>().InstancePerLifetimeScope();
             // builder.RegisterModule(new MyAutofacModule);
 
             // Adds ASP.NET Core-registered services to the Autofac container
