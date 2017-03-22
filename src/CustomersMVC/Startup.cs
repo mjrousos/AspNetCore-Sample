@@ -47,6 +47,9 @@ namespace CustomersMVC
                 app.UseExceptionHandler("/Shared/Error");
             }
 
+            // Middleware: Here, we add our custom middleware type to the HTTP processing pipeline
+            app.UseRequestCorrelation();
+
             app.UseStaticFiles();
 
             app.UseMvc(routes =>

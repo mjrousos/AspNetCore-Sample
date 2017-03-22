@@ -1,7 +1,9 @@
 ﻿using CustomersMVC.Customers;
 using CustomersMVC.CustomersAPI;
 using Microsoft.AspNetCore.Mvc;
+using RequestCorrelation;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace CustomersMVC.Controllers
@@ -24,6 +26,7 @@ namespace CustomersMVC.Controllers
         [Route("[Controller]/[Action]")]
         public async Task<IActionResult> CustomersList()
         {
+            SetCorrelationId();
             var customersList = await _customersService.GetCustomersListAsync();
             return View(customersList);
         }
@@ -31,6 +34,7 @@ namespace CustomersMVC.Controllers
         [Route("[Controller]/[Action]")]
         public async Task<IActionResult> AddCustomer()
         {
+            SetCorrelationId();
             var customer = new CustomerEntity
             {
                 Id = Guid.NewGuid(),
@@ -46,8 +50,15 @@ namespace CustomersMVC.Controllers
         [Route("[Controller]/[Action]/{customerId}")]
         public async Task<IActionResult> DeleteCustomer(Guid customerId)
         {
+            SetCorrelationId();
             await _customersService.DeleteCustomerAsync(customerId);
             return RedirectToAction("CustomersList");
         }
+
+        // If the request has a correlation ID, register it with the HTTP client (to be included in outgoing requests)
+        private void SetCorrelationId() =>
+            _customersService.CorrelationId = HttpContext?.Request.Headers
+                                                    .FirstOrDefault(h => h.Key.Equals(RequestCorrelationMiddleware.CorrelationHeaderName, StringComparison.OrdinalIgnoreCase))
+                                                    .Value.FirstOrDefault();
     }
 }

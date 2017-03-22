@@ -8,12 +8,28 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using System.Text;
+using RequestCorrelation;
 
 namespace CustomersMVC.CustomersAPI
 {
     public class CustomersAPIService
     {
         private readonly HttpClient _client;
+
+        // This application uses the X-Correlation-Id header to associated separate
+        // HTTP requests which are part of the same logical operation. If a correlation ID
+        // is known, it should be included in outgoing request headers.
+        internal string CorrelationId
+        { 
+            set
+            {
+                if (!string.IsNullOrWhiteSpace(value))
+                {
+                    _client.DefaultRequestHeaders.Remove(RequestCorrelationMiddleware.CorrelationHeaderName);
+                    _client.DefaultRequestHeaders.Add(RequestCorrelationMiddleware.CorrelationHeaderName, value);
+                }
+            }
+        }
 
         public CustomersAPIService(HttpClient client)
         {
