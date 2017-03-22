@@ -14,6 +14,7 @@ using System;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using RequestCorrelation;
 
 namespace CustomerAPI
 {
@@ -113,6 +114,9 @@ namespace CustomerAPI
             });
 
             app.UseStaticFiles();
+
+            // Middleware: More complex middleware can be added with the app.UseMiddleware method
+            app.UseMiddleware<RequestCorrelationMiddleware>();
 
             app.UseMvc();
 
