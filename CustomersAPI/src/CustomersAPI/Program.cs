@@ -13,10 +13,10 @@ namespace CustomerAPI
         {
             var host = new WebHostBuilder()
                 .UseKestrel()
-                // Services can be registered with the ASP.NET Core DI container at IWebHost build-time
+                // Dependency Injection: Services can be registered with the ASP.NET Core DI container at IWebHost build-time
                 // by calling ConfigureServices on the WebHostBuilder.
                 //
-                // This is an easy way of injecting services that wouldn't otherwise be available in
+                // Dependency Injection: This is an easy way of injecting services that wouldn't otherwise be available in
                 // the web application's Startup class (for example, web apps running in a Service Fabric
                 // application could have their service context injected here).
                 .ConfigureServices(serviceCollection =>

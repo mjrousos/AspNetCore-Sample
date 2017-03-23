@@ -8,8 +8,6 @@ using Swashbuckle.Swagger.Model;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
-using System.Resources;
-using System.Reflection;
 using Autofac;
 using System;
 using Autofac.Extensions.DependencyInjection;
@@ -64,8 +62,9 @@ namespace CustomerAPI
             services.AddDbContext<EFCustomersDataProvider>(options =>
                 options.UseInMemoryDatabase());
 
-            // This could be added directly to services, but in this sample we're adding it
-            // to the Autofac container in order to demonstrate that interaction.
+            // Dependency Injection: This could be added directly to services (via AddScoped), 
+            // but in this sample we're adding it to the Autofac container in order to 
+            // demonstrate that interaction.
             // services.AddScoped<ICustomersDataProvider, EFCustomersDataProvider>();
 
             // Setup Autofac integration
@@ -73,16 +72,18 @@ namespace CustomerAPI
 
             // Autofac registration calls can go here.
             builder.RegisterType<EFCustomersDataProvider>().As<ICustomersDataProvider>().InstancePerLifetimeScope();
+            // If the container requires many registrations or registrations that are shared with other
+            // containers, builder.RegisterModule is a useful API.
             // builder.RegisterModule(new MyAutofacModule);
 
-            // Adds ASP.NET Core-registered services to the Autofac container
+            // Dependency Injection: Adds ASP.NET Core-registered services to the Autofac container
             builder.Populate(services);
 
-            // Storing the container in a field so that other components can make use of it.
+            // Dependency Injection: Storing the container in a field so that other components can make use of it.
             // In many scenarios, this isn't necessary. builder.Build() can often be returned directly.
             AutofacContainer = builder.Build();
 
-            // Return the DI container to be used by this web application.
+            // Dependency Injection: Return the DI container to be used by this web application.
             return new AutofacServiceProvider(AutofacContainer);
         }
 

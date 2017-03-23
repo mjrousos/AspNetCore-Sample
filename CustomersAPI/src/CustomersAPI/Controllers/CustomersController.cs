@@ -15,7 +15,7 @@ namespace CustomerAPI.Controllers
         private readonly ICustomersDataProvider _customersDataProvider;
         private readonly ResourceManager _resourceManager;
 
-        // ASP.NET Core will automatically populate controller constructor arguments by resolving
+        // Dependency Injection: ASP.NET Core will automatically populate controller constructor arguments by resolving
         // services from the DI container. If needed, those objects will be created by calling constructors
         // whose own arguments will be provided by DI, and so on recursively until the whole object graph
         // needed has been constructed.
@@ -40,7 +40,7 @@ namespace CustomerAPI.Controllers
 
             if (!customerDataActionResult.IsSuccess)
             {
-                // HttpContext.RequestService can be used to resolve depdency-injected services
+                // Dependency Injection: HttpContext.RequestService can be used to resolve depdency-injected services
                 // But receiving them via constructor injection is preferred.
                 var resourceManager = HttpContext.RequestServices.GetService(typeof(ResourceManager)) as ResourceManager;
 
@@ -52,8 +52,8 @@ namespace CustomerAPI.Controllers
 
         // POST api/Customers
         [HttpPost]
-        public async Task<ObjectResult> PostAsync([FromBody]CustomerDataTransferObject customerDataTransferObject, 
-                                                  // Another way of requesting services from DI is [FromServices]
+        public async Task<ObjectResult> PostAsync([FromBody]CustomerDataTransferObject customerDataTransferObject,
+                                                  // Dependency Injection: Another way of requesting services from DI is [FromServices]
                                                   [FromServices] ResourceManager resManager)
         {
             if (customerDataTransferObject == null || !customerDataTransferObject.ValidateCustomerDataTransferObject())
