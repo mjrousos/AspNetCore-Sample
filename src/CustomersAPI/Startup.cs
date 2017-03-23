@@ -8,9 +8,9 @@ using Swashbuckle.Swagger.Model;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
-using System.Resources;
-using System.Reflection;
+using Autofac;
 using System;
+using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 using System.Diagnostics;
@@ -20,6 +20,8 @@ namespace CustomerAPI
 {
     public class Startup
     {
+        public IContainer AutofacContainer;
+
         public Startup(IHostingEnvironment env)
         {
             /* This section adds in configuration from different configuration sources including
@@ -35,8 +37,13 @@ namespace CustomerAPI
 
         public IConfigurationRoot Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        // This method gets called by the runtime. 
+        // Use this method to add services to the dependency injection container.
+        //
+        // If using the built-in ASP.NET Core dependency injection container, this
+        // method can return void. Otherwise, it should return an IServiceProvider containing
+        // the non-default container used.
+        public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             // Add framework services.
             services.AddMvc();
@@ -56,11 +63,32 @@ namespace CustomerAPI
             });
 
             // Add Entity Framework Customers data provider
-            services.AddSingleton<ICustomersDataProvider>(CreateCustomersDataProvider());
+            services.AddDbContext<EFCustomersDataProvider>(options =>
+                options.UseInMemoryDatabase());
 
-            //Add ResourceManager singleton
-            services.AddSingleton(new ResourceManager("CustomersAPI.Resources.StringResources",
-                                                      typeof(Startup).GetTypeInfo().Assembly));
+            // Dependency Injection: This could be added directly to services (via AddScoped), 
+            // but in this sample we're adding it to the Autofac container in order to 
+            // demonstrate that interaction.
+            // services.AddScoped<ICustomersDataProvider, EFCustomersDataProvider>();
+
+            // Setup Autofac integration
+            var builder = new ContainerBuilder();
+
+            // Autofac registration calls can go here.
+            builder.RegisterType<EFCustomersDataProvider>().As<ICustomersDataProvider>().InstancePerLifetimeScope();
+            // If the container requires many registrations or registrations that are shared with other
+            // containers, builder.RegisterModule is a useful API.
+            // builder.RegisterModule(new MyAutofacModule);
+
+            // Dependency Injection: Adds ASP.NET Core-registered services to the Autofac container
+            builder.Populate(services);
+
+            // Dependency Injection: Storing the container in a field so that other components can make use of it.
+            // In many scenarios, this isn't necessary. builder.Build() can often be returned directly.
+            AutofacContainer = builder.Build();
+
+            // Dependency Injection: Return the DI container to be used by this web application.
+            return new AutofacServiceProvider(AutofacContainer);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -123,26 +151,5 @@ namespace CustomerAPI
             app.UseSwagger();
             app.UseSwaggerUi();
         }
-
-        /// <summary>
-        /// Creates a new Customers data provider with the options to create a new in memory database
-        /// </summary>
-        private ICustomersDataProvider CreateCustomersDataProvider()
-        {
-            // Create a fresh service provider, and therefore a fresh 
-            // InMemory database instance.
-            var serviceProvider = new ServiceCollection()
-                .AddEntityFrameworkInMemoryDatabase()
-                .BuildServiceProvider();
-
-            // Create a new options instance telling the context to use an
-            // InMemory database and the new service provider.
-            var builder = new DbContextOptionsBuilder<EFCustomersDataProvider>();
-            builder.UseInMemoryDatabase()
-                   .UseInternalServiceProvider(serviceProvider);
-
-            return new EFCustomersDataProvider(builder.Options);
-        }
-
     }
 }
