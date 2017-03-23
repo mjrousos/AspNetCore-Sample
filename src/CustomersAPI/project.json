@@ -23,7 +23,10 @@
     "Autofac": "4.4.0",
     "Autofac.Extensions.DependencyInjection": "4.0.0",
 
-    "CustomersDataModels": "1.0.0"
+    "CustomersDataModels": {
+      "target": "project",
+      "version": "1.0.0"
+    }
   },
 
   "tools": {

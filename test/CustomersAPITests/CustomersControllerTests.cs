@@ -100,7 +100,7 @@ namespace CustomerAPI.Controllers.Tests
                 var customersController = CreateTestCustomersController(customersDataProvider);
 
                 //act
-                var result = await customersController.PostAsync(null);
+                var result = await customersController.PostAsync(null, null);
 
                 //assert
                 Assert.Equal(CustomerInfoInvalidErrorText, result.Value);
@@ -117,7 +117,7 @@ namespace CustomerAPI.Controllers.Tests
                 var customersController = CreateTestCustomersController(customersDataProvider);
 
                 //act
-                var result = await customersController.PostAsync(new CustomerDataTransferObject());
+                var result = await customersController.PostAsync(new CustomerDataTransferObject(), null);
 
                 //assert
                 Assert.Equal(CustomerInfoInvalidErrorText, result.Value);
@@ -140,7 +140,7 @@ namespace CustomerAPI.Controllers.Tests
                 };
 
                 //act
-                var result = ((ObjectResult)await customersController.PostAsync(newCustomer));
+                var result = ((ObjectResult)await customersController.PostAsync(newCustomer, null));
 
                 //assert
                 Assert.Equal(StatusCodes.Status200OK, result.StatusCode);

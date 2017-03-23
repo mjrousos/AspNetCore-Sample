@@ -3,9 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{213709AB-9DAB-43D9-B6B9-6F4249639BA1}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E5F63E9C-2BCB-4456-BD59-6F6DC775FE9A}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4188C786-5514-4B0F-A05E-19D19452D8D9}"
 	ProjectSection(SolutionItems) = preProject
 		global.json = global.json
 		NuGet.config = NuGet.config
@@ -13,9 +11,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "CustomersAPI", "src\CustomersAPI\CustomersAPI.xproj", "{976D3A74-BDCC-4BF8-B449-CB7AFCD3B273}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{4E9726EF-051F-4348-ACE7-BC19FC6D0F44}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "CustomersDataModels", "src\CustomersDataModels\CustomersDataModels.xproj", "{C10B99CA-F265-487B-9120-C4BBA08719F8}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "CustomersAPITests", "tests\CustomersAPITests\CustomersAPITests.xproj", "{E4E2C0A9-E306-410D-AF3F-DF04A4683CB0}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "CustomersMVC", "src\CustomersMVC\CustomersMVC.xproj", "{1F8B5914-28C0-4AF4-B328-7F9FCAC7A9C4}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "CustomersAPITests", "test\CustomersAPITests\CustomersAPITests.xproj", "{E4E2C0A9-E306-410D-AF3F-DF04A4683CB0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{5B28A508-8FB8-434B-9FB4-538BAF5EA21F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,14 @@ Global
 		{976D3A74-BDCC-4BF8-B449-CB7AFCD3B273}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{976D3A74-BDCC-4BF8-B449-CB7AFCD3B273}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{976D3A74-BDCC-4BF8-B449-CB7AFCD3B273}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C10B99CA-F265-487B-9120-C4BBA08719F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C10B99CA-F265-487B-9120-C4BBA08719F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C10B99CA-F265-487B-9120-C4BBA08719F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C10B99CA-F265-487B-9120-C4BBA08719F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F8B5914-28C0-4AF4-B328-7F9FCAC7A9C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F8B5914-28C0-4AF4-B328-7F9FCAC7A9C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F8B5914-28C0-4AF4-B328-7F9FCAC7A9C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F8B5914-28C0-4AF4-B328-7F9FCAC7A9C4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E4E2C0A9-E306-410D-AF3F-DF04A4683CB0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E4E2C0A9-E306-410D-AF3F-DF04A4683CB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E4E2C0A9-E306-410D-AF3F-DF04A4683CB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -36,7 +46,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{976D3A74-BDCC-4BF8-B449-CB7AFCD3B273} = {213709AB-9DAB-43D9-B6B9-6F4249639BA1}
-		{E4E2C0A9-E306-410D-AF3F-DF04A4683CB0} = {4E9726EF-051F-4348-ACE7-BC19FC6D0F44}
+		{E4E2C0A9-E306-410D-AF3F-DF04A4683CB0} = {5B28A508-8FB8-434B-9FB4-538BAF5EA21F}
 	EndGlobalSection
 EndGlobal
