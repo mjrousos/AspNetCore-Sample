@@ -20,6 +20,23 @@ namespace CustomerAPI.Controllers.Tests
         private const string InternalServerErrorText = "Something unexpected went wrong during the request!";
         private const string CustomerNotFoundErrorText = "Could not find customer with Id of {0}";
 
+        private readonly IServiceProvider _serviceProvider;
+
+        public CustomersControllerTests()
+        {
+            // Setup mock services
+            var services = new ServiceCollection();
+            
+            var efServiceProvider = new ServiceCollection().AddEntityFrameworkInMemoryDatabase().BuildServiceProvider();
+            services.AddDbContext<EFCustomersDataProvider>(options =>
+                options.UseInMemoryDatabase().UseInternalServiceProvider(efServiceProvider));
+            services.AddScoped<ICustomersDataProvider, EFCustomersDataProvider>();
+            services.AddSingleton(new ResourceManager("CustomersAPI.Resources.StringResources",
+                                          typeof(Startup).GetTypeInfo().Assembly));
+
+            _serviceProvider = services.BuildServiceProvider();
+        }
+
         //Test Get() method
         [Fact]
         public void GetWithNoCustomersReturnsEmptyEnumerable()
@@ -100,7 +117,8 @@ namespace CustomerAPI.Controllers.Tests
                 var customersController = CreateTestCustomersController(customersDataProvider);
 
                 //act
-                var result = await customersController.PostAsync(null, null);
+                // Pass the ResourceManager explicitly since there's no global service provider to provide it
+                var result = await customersController.PostAsync(null, _serviceProvider.GetRequiredService<ResourceManager>());
 
                 //assert
                 Assert.Equal(CustomerInfoInvalidErrorText, result.Value);
@@ -117,7 +135,8 @@ namespace CustomerAPI.Controllers.Tests
                 var customersController = CreateTestCustomersController(customersDataProvider);
 
                 //act
-                var result = await customersController.PostAsync(new CustomerDataTransferObject(), null);
+                // Pass the ResourceManager explicitly since there's no global service provider to provide it
+                var result = await customersController.PostAsync(new CustomerDataTransferObject(), _serviceProvider.GetRequiredService<ResourceManager>());
 
                 //assert
                 Assert.Equal(CustomerInfoInvalidErrorText, result.Value);
@@ -140,7 +159,8 @@ namespace CustomerAPI.Controllers.Tests
                 };
 
                 //act
-                var result = ((ObjectResult)await customersController.PostAsync(newCustomer, null));
+                // Pass the ResourceManager explicitly since there's no global service provider to provide it
+                var result = ((ObjectResult)await customersController.PostAsync(newCustomer, _serviceProvider.GetRequiredService<ResourceManager>()));
 
                 //assert
                 Assert.Equal(StatusCodes.Status200OK, result.StatusCode);
@@ -269,34 +289,20 @@ namespace CustomerAPI.Controllers.Tests
         }
 
         #region TestHelpers
-        internal override ICustomersDataProvider CreateCustomersDataProvider()
-        {
-            // Create a fresh service provider, and therefore a fresh 
-            // InMemory database instance.
-            var serviceProvider = new ServiceCollection()
-                .AddEntityFrameworkInMemoryDatabase()
-                .BuildServiceProvider();
-
-            // Create a new options instance telling the context to use an
-            // InMemory database and the new service provider.
-            var builder = new DbContextOptionsBuilder<EFCustomersDataProvider>();
-            builder.UseInMemoryDatabase()
-                       .UseInternalServiceProvider(serviceProvider);
-
-            return new EFCustomersDataProvider(builder.Options);
-        }
+        internal override ICustomersDataProvider CreateCustomersDataProvider() => _serviceProvider.GetRequiredService<ICustomersDataProvider>();
 
         /// <summary>
         /// Creates a test CustomersController to test with
         /// </summary>
         private CustomersController CreateTestCustomersController(ICustomersDataProvider customersDataProvider)
         {
-            return new CustomersController(
-                customersDataProvider,
-                new ResourceManager(
-                    "CustomersAPI.Resources.StringResources",
-                    typeof(CustomersController).GetTypeInfo().Assembly)
-            );
+            var controller = new CustomersController(customersDataProvider, _serviceProvider.GetRequiredService<ResourceManager>());
+
+            // Set mock HTTP context (including DI service provider)
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.ControllerContext.HttpContext.RequestServices = _serviceProvider;            
+
+            return controller;
         }
         #endregion
     }
