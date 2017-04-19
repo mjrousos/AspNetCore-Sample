@@ -1,0 +1,13 @@
+version: '2'
+
+# Additional docker-compose files like this one can
+# contain environment-specific settings to easily deploy
+# a core docker-compose file with scenario-specific modifications
+services:
+  customersapi:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+
+  customersmvc:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development

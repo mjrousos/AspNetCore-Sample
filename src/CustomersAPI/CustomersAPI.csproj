@@ -7,6 +7,7 @@
     <OutputType>Exe</OutputType>
     <PackageId>CustomersAPI</PackageId>
     <RuntimeFrameworkVersion>1.0.4</RuntimeFrameworkVersion>
+    <DockerComposeProjectPath>..\..\docker-compose.dcproj</DockerComposeProjectPath>
   </PropertyGroup>
 
   <ItemGroup>
