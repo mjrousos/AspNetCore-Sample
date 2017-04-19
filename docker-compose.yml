@@ -1,0 +1,32 @@
+version: '2'
+
+services:
+  # Each Docker container that's part of the app
+  # should be listed in docker-compose
+  customersapi:
+    # Name for the Docker container
+    # Note that this will also be the name that other containers
+    # can use to refer to this one from within the Docker-compose cluster
+    image: customersapi
+    ports:
+      - "5000"
+    build:
+      context: ./src/CustomersAPI
+      dockerfile: Dockerfile
+
+  customersmvc:
+    image: customersmvc
+    # Environment variables can be specified here.
+    # Notice that : can be replaced with __
+    # 
+    # Note also that this URL refers to our container
+    # using its image name.
+    environment:
+      CustomersAPIService__Url: http://customersapi:5000
+    ports:
+      - "8080:5001"
+    links:
+      - customersapi
+    build:
+      context: ./src/CustomersMVC
+      dockerfile: Dockerfile
