@@ -11,8 +11,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\RequestCorrelation\RequestCorrelation.csproj" />
     <ProjectReference Include="..\CustomersDataModels\CustomersDataModels.csproj" />
+    <ProjectReference Include="..\RequestCorrelation\RequestCorrelation.csproj" />
   </ItemGroup>
 
   <ItemGroup>

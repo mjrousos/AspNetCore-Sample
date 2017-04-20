@@ -29,7 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\RequestCorrelation\RequestCorrelation.csproj" />
+    <ProjectReference Include="..\RequestCorrelation\RequestCorrelation.csproj" />
   </ItemGroup>
 
 </Project>
