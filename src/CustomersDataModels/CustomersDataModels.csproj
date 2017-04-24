@@ -1,14 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard1.6</TargetFramework>
+    <TargetFramework>netstandard1.3</TargetFramework>
+    <Notes>NetStandard1.3 is used for the best practice of using the lowest netstandard version that can be applied</Notes>
     <AssemblyName>CustomersDataModels</AssemblyName>
     <PackageId>CustomersDataModels</PackageId>
-    <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
-    <PackageTargetFallback>$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <Title>Simple customer data model</Title>
+    <Authors>Jon Jung</Authors>
+    <Version>1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
