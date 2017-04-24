@@ -1,43 +1,45 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿// Licensed under the MIT license. See LICENSE file in the samples root for full license information.
+
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
+using CustomerAPI.Data;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using CustomerAPI.Data;
-using Swashbuckle.Swagger.Model;
-using Microsoft.EntityFrameworkCore;
-using System.Globalization;
-using Microsoft.AspNetCore.Localization;
-using Autofac;
-using System;
-using Autofac.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Http;
-using System.Threading.Tasks;
-using System.Diagnostics;
 using RequestCorrelation;
+using Swashbuckle.Swagger.Model;
+using System;
+using System.Diagnostics;
+using System.Globalization;
+using System.Threading.Tasks;
 
 namespace CustomerAPI
 {
     public class Startup
     {
-        public IContainer AutofacContainer;
+        private IContainer _autofacContainer;
 
         public Startup(IHostingEnvironment env)
         {
-            /* This section adds in configuration from different configuration sources including
-               .json files and environment variables
-            */
+            // This section adds in configuration from different configuration sources including
+            // .json files and environment variables
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
+
             Configuration = builder.Build();
         }
 
         public IConfigurationRoot Configuration { get; }
 
-        // This method gets called by the runtime. 
+        // This method gets called by the runtime.
         // Use this method to add services to the dependency injection container.
         //
         // If using the built-in ASP.NET Core dependency injection container, this
@@ -59,6 +61,7 @@ namespace CustomerAPI
                     Description = "Customer Demo API",
                     TermsOfService = "None"
                 });
+
                 options.DescribeAllEnumsAsStrings();
             });
 
@@ -66,8 +69,8 @@ namespace CustomerAPI
             services.AddDbContext<EFCustomersDataProvider>(options =>
                 options.UseInMemoryDatabase());
 
-            // Dependency Injection: This could be added directly to services (via AddScoped), 
-            // but in this sample we're adding it to the Autofac container in order to 
+            // Dependency Injection: This could be added directly to services (via AddScoped),
+            // but in this sample we're adding it to the Autofac container in order to
             // demonstrate that interaction.
             // services.AddScoped<ICustomersDataProvider, EFCustomersDataProvider>();
 
@@ -76,6 +79,7 @@ namespace CustomerAPI
 
             // Autofac registration calls can go here.
             builder.RegisterType<EFCustomersDataProvider>().As<ICustomersDataProvider>().InstancePerLifetimeScope();
+
             // If the container requires many registrations or registrations that are shared with other
             // containers, builder.RegisterModule is a useful API.
             // builder.RegisterModule(new MyAutofacModule);
@@ -85,16 +89,16 @@ namespace CustomerAPI
 
             // Dependency Injection: Storing the container in a field so that other components can make use of it.
             // In many scenarios, this isn't necessary. builder.Build() can often be returned directly.
-            AutofacContainer = builder.Build();
+            _autofacContainer = builder.Build();
 
             // Dependency Injection: Return the DI container to be used by this web application.
-            return new AutofacServiceProvider(AutofacContainer);
+            return new AutofacServiceProvider(_autofacContainer);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            //Add some logging options
+            // Add some logging options
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
@@ -103,7 +107,8 @@ namespace CustomerAPI
             // Middleware: Note that middleware will execute in the pipeline in the order it is registered.
             //             Since this trivial middleware is meant to time how long the entire processing
             //             of request takes, it is included very early in the middleware pipeline.
-            var timingLogger = loggerFactory.CreateLogger("Timing Middleware");
+            var timingLogger = loggerFactory.CreateLogger("CustomerAPI.Startup.TimingMiddleware");
+
             app.Use(async (HttpContext context, Func<Task> next) =>
             {
                 // Middleware: Logic to run regarding the request prior to invoking more middleware.
@@ -123,7 +128,7 @@ namespace CustomerAPI
                 timingLogger.LogInformation($"Request to {context.Request.Method}:{context.Request.Path} processed in {timer.ElapsedMilliseconds} ms");
             });
 
-            /* Add Global/Localization support for more information see 
+            /* Add Global/Localization support for more information see
                https://docs.asp.net/en/latest/fundamentals/localization.html */
             var supportedCultures = new[]
               {
@@ -131,12 +136,14 @@ namespace CustomerAPI
                     new CultureInfo("es-MX"),
                     new CultureInfo("fr-FR"),
               };
-            
+
             app.UseRequestLocalization(new RequestLocalizationOptions
             {
                 DefaultRequestCulture = new RequestCulture("en-US"),
+
                 // Formatting numbers, dates, etc.
                 SupportedCultures = supportedCultures,
+
                 // UI strings that we have localized.
                 SupportedUICultures = supportedCultures
             });

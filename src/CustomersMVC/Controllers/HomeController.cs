@@ -1,4 +1,6 @@
-﻿using CustomersMVC.Customers;
+﻿// Licensed under the MIT license. See LICENSE file in the samples root for full license information.
+
+using CustomersMVC.Customers;
 using CustomersMVC.CustomersAPI;
 using Microsoft.AspNetCore.Mvc;
 using RequestCorrelation;
@@ -27,7 +29,9 @@ namespace CustomersMVC.Controllers
         public async Task<IActionResult> CustomersList()
         {
             SetCorrelationId();
+
             var customersList = await _customersService.GetCustomersListAsync();
+
             return View(customersList);
         }
 
@@ -35,6 +39,7 @@ namespace CustomersMVC.Controllers
         public async Task<IActionResult> AddCustomer()
         {
             SetCorrelationId();
+
             var customer = new CustomerEntity
             {
                 Id = Guid.NewGuid(),
@@ -44,6 +49,7 @@ namespace CustomersMVC.Controllers
             };
 
             await _customersService.AddCustomerAsync(customer);
+
             return RedirectToAction("CustomersList");
         }
 
@@ -51,14 +57,16 @@ namespace CustomersMVC.Controllers
         public async Task<IActionResult> DeleteCustomer(Guid customerId)
         {
             SetCorrelationId();
+
             await _customersService.DeleteCustomerAsync(customerId);
+
             return RedirectToAction("CustomersList");
         }
 
         // If the request has a correlation ID, register it with the HTTP client (to be included in outgoing requests)
         private void SetCorrelationId() =>
             _customersService.CorrelationId = HttpContext?.Request.Headers
-                                                    .FirstOrDefault(h => h.Key.Equals(RequestCorrelationMiddleware.CorrelationHeaderName, StringComparison.OrdinalIgnoreCase))
-                                                    .Value.FirstOrDefault();
+                                              .First(h => h.Key.Equals(RequestCorrelationMiddleware.CorrelationHeaderName, StringComparison.OrdinalIgnoreCase))
+                                              .Value.FirstOrDefault();
     }
 }

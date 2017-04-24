@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Licensed under the MIT license. See LICENSE file in the samples root for full license information.
+
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -12,7 +14,7 @@ namespace CustomersMVC.Customers
         public virtual Guid Id { get; set; }
 
         [Required]
-        public virtual string FirstName {get; set;}
+        public virtual string FirstName { get; set; }
 
         [Required]
         public virtual string LastName { get; set; }
@@ -29,5 +31,3 @@ namespace CustomersMVC.Customers
         public virtual int ZipCode { get; set; }
     }
 }
-
-

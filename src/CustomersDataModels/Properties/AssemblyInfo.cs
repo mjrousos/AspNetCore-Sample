@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿// Licensed under the MIT license. See LICENSE file in the samples root for full license information.
+
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 

@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿// Licensed under the MIT license. See LICENSE file in the samples root for full license information.
+
+using System.ComponentModel.DataAnnotations;
 
 namespace CustomersShared.Data.DataEntities
 {
@@ -58,19 +60,17 @@ namespace CustomersShared.Data.DataEntities
 
         public override int GetHashCode()
         {
-            int result = 0x2D2816FE;
+            var result = 0x2D2816FE;
 
-            result = result * 31 + (FirstName == null ? 0 : FirstName.GetHashCode());
-            result = result * 31 + (LastName == null ? 0 : LastName.GetHashCode());
-            result = result * 31 + (PhoneNumber == null ? 0 : PhoneNumber.GetHashCode());
-            result = result * 31 + (Address == null ? 0 : Address.GetHashCode());
-            result = result * 31 + (City == null ? 0 : City.GetHashCode());
-            result = result * 31 + (State == null ? 0 : State.GetHashCode());
+            result = result * 31 + FirstName?.GetHashCode() ?? 0;
+            result = result * 31 + LastName?.GetHashCode() ?? 0;
+            result = result * 31 + PhoneNumber?.GetHashCode() ?? 0;
+            result = result * 31 + Address?.GetHashCode() ?? 0;
+            result = result * 31 + City?.GetHashCode() ?? 0;
+            result = result * 31 + State?.GetHashCode() ?? 0;
             result = result * 31 + (ZipCode == 0 ? 0 : ZipCode.GetHashCode());
 
             return result;
         }
     }
 }
-
-

@@ -1,4 +1,6 @@
-﻿using CustomerAPI.Data;
+﻿// Licensed under the MIT license. See LICENSE file in the samples root for full license information.
+
+using CustomerAPI.Data;
 using CustomersShared.Data.DataEntities;
 using System;
 using System.Collections.Generic;
@@ -6,18 +8,17 @@ using System.Linq;
 using System.Reflection;
 using Xunit;
 
-namespace CustomerAPITests.CustomerDataProviders
+namespace CustomerAPI.CustomerDataProviders.Tests
 {
-
     public abstract class BaseCustomersDataProviderHelpers
     {
-        internal readonly IEnumerable<CustomerDataTransferObject> SampleListOfCustomerDataTransferObjects;
-
         public BaseCustomersDataProviderHelpers()
         {
-            //populate SampleListOfCustomerDataTransferObjects
+            // populate SampleListOfCustomerDataTransferObjects
             SampleListOfCustomerDataTransferObjects = CreateListOfCustomers(10);
         }
+
+        internal IEnumerable<CustomerDataTransferObject> SampleListOfCustomerDataTransferObjects { get; }
 
         /// <summary>
         /// Creates a test customersDataProvider
@@ -48,7 +49,6 @@ namespace CustomerAPITests.CustomerDataProviders
         internal void CompareCustomerLists(IEnumerable<CustomerDataTransferObject> listOfCustomerInfo,
                                           IEnumerable<CustomerEntity> listOfCustomerEntities)
         {
-
             var compareList = listOfCustomerEntities.Select(c => new CustomerDataTransferObject
             {
                 FirstName = c.FirstName,
@@ -63,7 +63,6 @@ namespace CustomerAPITests.CustomerDataProviders
             Assert.Equal(0, listOfCustomerInfo.Except(compareList).Count());
         }
 
-
         /// <summary>
         /// Ensures each customer property except id are equal in both customer objects
         /// </summary>
@@ -74,18 +73,17 @@ namespace CustomerAPITests.CustomerDataProviders
                 var customerEntityPropertyInfo = GetCustomerEntityPropertyInfo(item);
                 Assert.Equal(customerEntityPropertyInfo.GetValue(customerEntity), item.GetValue(customerInfo));
             }
-
         }
 
         /// <summary>
         /// Creates a list of customers for using in tests
         /// </summary>
-        /// <param name="count">number of customers to put in the list</param>
+        /// <param name="numberOfRecordsToCreate">number of customers to put in the list</param>
         private IEnumerable<CustomerDataTransferObject> CreateListOfCustomers(int numberOfRecordsToCreate)
         {
             var customersList = new List<CustomerDataTransferObject>();
 
-            for (int i = 0; i < numberOfRecordsToCreate; i++)
+            for (var i = 0; i < numberOfRecordsToCreate; i++)
             {
                 customersList.Add(new CustomerDataTransferObject
                 {

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿// Licensed under the MIT license. See LICENSE file in the samples root for full license information.
+
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 using System;
@@ -7,14 +9,14 @@ using System.Threading.Tasks;
 
 namespace RequestCorrelation
 {
-    // Middleware: This custom middleware component makes sure that an X-Correlation-Id header is set
+    // Middleware: This custom middleware component makes sure that an X-Correlation-Id header is set.
     //             It uses an existing correlation ID if one is present or generates a new one, otherwise
     //             This ID is made available to loggers and can be used to associate separate requests
     //             which combine to form a complete customer action end-to-end.
     public class RequestCorrelationMiddleware
     {
-        private readonly RequestDelegate _next;
         public const string CorrelationHeaderName = "X-Correlation-ID";
+        private readonly RequestDelegate _next;
 
         // Middleware: Custom middleware types need to have a constructor taking a RequestDelegate argument
         //             that is used to call the next piece of the middleware pipeline. We store it for later.
@@ -42,8 +44,8 @@ namespace RequestCorrelation
                 logger.LogInformation($"Request has no correlation header. Adding new correlation ID: {correlationId}");
                 context.Request.Headers.Add(CorrelationHeaderName, new StringValues(correlationId));
             }
-            
-            var correlationHeader = context.Request.Headers.FirstOrDefault(h => h.Key.Equals(CorrelationHeaderName, StringComparison.OrdinalIgnoreCase));
+
+            var correlationHeader = context.Request.Headers.First(h => h.Key.Equals(CorrelationHeaderName, StringComparison.OrdinalIgnoreCase));
             logger.LogInformation($"Request correlation ID: {correlationHeader.Value.First()}");
 
             // Propagate the correlation header from the request to the response

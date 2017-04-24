@@ -1,4 +1,6 @@
-﻿using CustomersShared.Data.DataEntities;
+﻿// Licensed under the MIT license. See LICENSE file in the samples root for full license information.
+
+using CustomersShared.Data.DataEntities;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

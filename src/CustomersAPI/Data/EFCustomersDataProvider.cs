@@ -1,4 +1,6 @@
-﻿using CustomersShared.Data.DataEntities;
+﻿// Licensed under the MIT license. See LICENSE file in the samples root for full license information.
+
+using CustomersShared.Data.DataEntities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -10,19 +12,21 @@ namespace CustomerAPI.Data
 {
     public class EFCustomersDataProvider : DbContext, ICustomersDataProvider
     {
-        private DbSet<CustomerEntity> _customers { get; set; }
         private readonly CustomerDataActionResult _failedCustomerDataActionResult = new CustomerDataActionResult(false, null);
 
-        public EFCustomersDataProvider(DbContextOptions options) : base(options)
+        public EFCustomersDataProvider(DbContextOptions options)
+            : base(options)
         {
         }
+
+        private DbSet<CustomerEntity> Customers { get; set; }
 
         /// <summary>
         /// Returns the list of CustomerEntities
         /// </summary>
         public IEnumerable<CustomerEntity> GetCustomers()
         {
-            return _customers;
+            return Customers;
         }
 
         /// <summary>
@@ -30,8 +34,8 @@ namespace CustomerAPI.Data
         /// </summary>
         public bool CustomerExists(Guid id)
         {
-            //TODO: Use DBSet.FindAsync when EF 1.1 comes out
-            return (_customers.FirstOrDefault(c => c.Id == id) != null);
+            // TODO: Use DBSet.FindAsync when EF 1.1 comes out
+            return Customers.FirstOrDefault(c => c.Id == id) != null;
         }
 
         /// <summary>
@@ -51,14 +55,14 @@ namespace CustomerAPI.Data
 
             var newCustomerEntity = new CustomerEntity();
             UpdateCustomerInfo(newCustomerEntity, customerDataTransferObject);
-            var customerEntityAdded = _customers.Add(newCustomerEntity);
+            var customerEntityAdded = Customers.Add(newCustomerEntity);
 
             if (customerEntityAdded?.Entity == null)
             {
                 return null;
             }
 
-            await this.SaveChangesAsync();
+            await SaveChangesAsync();
             return customerEntityAdded.Entity;
         }
 
@@ -67,10 +71,10 @@ namespace CustomerAPI.Data
         /// </summary>
         public async Task<CustomerEntity> DeleteCustomerAsync(Guid id)
         {
-            var customerEntity = _customers.First(c => c.Id == id);
-            var customerRemoved = _customers.Remove(customerEntity);
+            var customerEntity = Customers.First(c => c.Id == id);
+            var customerRemoved = Customers.Remove(customerEntity);
 
-            await this.SaveChangesAsync();
+            await SaveChangesAsync();
             return customerRemoved.Entity;
         }
 
@@ -79,8 +83,8 @@ namespace CustomerAPI.Data
         /// </summary>
         public CustomerEntity FindCustomer(Guid id)
         {
-            //TODO: When EF 1.1 comes in change this to use Customers.FindAsync method instead of Customers.First
-            return _customers.First(c => c.Id == id);
+            // TODO: When EF 1.1 comes in change this to use Customers.FindAsync method instead of Customers.First
+            return Customers.First(c => c.Id == id);
         }
 
         /// <summary>
@@ -91,7 +95,7 @@ namespace CustomerAPI.Data
             var customerEntity = FindCustomer(id);
             UpdateCustomerInfo(customerEntity, customerDataTransferObject);
 
-            await this.SaveChangesAsync();
+            await SaveChangesAsync();
             return customerEntity;
         }
 
@@ -136,7 +140,7 @@ namespace CustomerAPI.Data
                     return _failedCustomerDataActionResult;
                 }
 
-                await this.SaveChangesAsync();
+                await SaveChangesAsync();
                 return new CustomerDataActionResult(true, customerEntity);
             }
             catch
@@ -175,7 +179,7 @@ namespace CustomerAPI.Data
             if (!CustomerExists(id))
             {
                 return _failedCustomerDataActionResult;
-            };
+            }
 
             try
             {

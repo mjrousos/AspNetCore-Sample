@@ -1,8 +1,9 @@
-﻿using CustomerAPI.Data;
-using CustomerAPITests.CustomerDataProviders;
+﻿// Licensed under the MIT license. See LICENSE file in the samples root for full license information.
+
+using CustomerAPI.CustomerDataProviders.Tests;
+using CustomerAPI.Data;
 using CustomersShared.Data.DataEntities;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -14,7 +15,7 @@ using Xunit;
 
 namespace CustomerAPI.Controllers.Tests
 {
-    public class CustomersControllerTests: BaseCustomersDataProviderHelpers
+    public class CustomersControllerTests : BaseCustomersDataProviderHelpers
     {
         private const string CustomerInfoInvalidErrorText = "CustomerInfo is not valid!";
         private const string InternalServerErrorText = "Something unexpected went wrong during the request!";
@@ -26,7 +27,7 @@ namespace CustomerAPI.Controllers.Tests
         {
             // Setup mock services
             var services = new ServiceCollection();
-            
+
             var efServiceProvider = new ServiceCollection().AddEntityFrameworkInMemoryDatabase().BuildServiceProvider();
             services.AddDbContext<EFCustomersDataProvider>(options =>
                 options.UseInMemoryDatabase().UseInternalServiceProvider(efServiceProvider));
@@ -37,19 +38,19 @@ namespace CustomerAPI.Controllers.Tests
             _serviceProvider = services.BuildServiceProvider();
         }
 
-        //Test Get() method
+        // Test Get() method
         [Fact]
         public void GetWithNoCustomersReturnsEmptyEnumerable()
         {
             using (var customersDataProvider = CreateCustomersDataProvider())
             {
-                //arrange
+                // arrange
                 var customersController = CreateTestCustomersController(customersDataProvider);
 
-                //act
+                // act
                 var result = customersController.Get();
 
-                //assert
+                // assert
                 Assert.Equal(0, result.Count());
             }
         }
@@ -59,33 +60,33 @@ namespace CustomerAPI.Controllers.Tests
         {
             using (var customersDataProvider = CreateTestCustomerDataProvider(SampleListOfCustomerDataTransferObjects))
             {
-                //arrange
+                // arrange
                 var customersController = CreateTestCustomersController(customersDataProvider);
 
-                //act
+                // act
                 var result = customersController.Get();
 
-                //assert
+                // assert
                 Assert.Equal(SampleListOfCustomerDataTransferObjects.Count(), result.Count());
                 CompareCustomerLists(SampleListOfCustomerDataTransferObjects, result);
             }
         }
 
-        //Test Get(Guid Id) method
+        // Test Get(Guid Id) method
         [Fact]
         public void GetByIdNonExistingCustomerReturns404NotFound()
         {
             using (var customersDataProvider = CreateTestCustomerDataProvider(SampleListOfCustomerDataTransferObjects))
             {
-                //arrange
+                // arrange
                 var customersController = CreateTestCustomersController(customersDataProvider);
 
-                //act
+                // act
                 var guid = Guid.NewGuid();
                 var result = customersController.Get(guid);
 
                 Assert.Equal(StatusCodes.Status404NotFound, result.StatusCode);
-                Assert.Equal(String.Format(CustomerNotFoundErrorText, guid), result.Value);
+                Assert.Equal(string.Format(CustomerNotFoundErrorText, guid), result.Value);
             }
         }
 
@@ -94,10 +95,10 @@ namespace CustomerAPI.Controllers.Tests
         {
             using (var customersDataProvider = CreateTestCustomerDataProvider(SampleListOfCustomerDataTransferObjects))
             {
-                //arrange
+                // arrange
                 var customersController = CreateTestCustomersController(customersDataProvider);
 
-                //act
+                // act
                 foreach (var customer in customersDataProvider.GetCustomers())
                 {
                     var result = customersController.Get(customer.Id);
@@ -107,20 +108,20 @@ namespace CustomerAPI.Controllers.Tests
             }
         }
 
-        //Test PostAsync(CustomerEntity) method
+        // Test PostAsync(CustomerEntity) method
         [Fact]
         public async Task PostAsyncWithNullCustomerInfoReturnsBadRequest()
         {
             using (var customersDataProvider = CreateCustomersDataProvider())
             {
-                //arrange
+                // arrange
                 var customersController = CreateTestCustomersController(customersDataProvider);
 
-                //act
+                // act
                 // Pass the ResourceManager explicitly since there's no global service provider to provide it
                 var result = await customersController.PostAsync(null, _serviceProvider.GetRequiredService<ResourceManager>());
 
-                //assert
+                // assert
                 Assert.Equal(CustomerInfoInvalidErrorText, result.Value);
                 Assert.Equal(StatusCodes.Status400BadRequest, result.StatusCode);
             }
@@ -131,14 +132,14 @@ namespace CustomerAPI.Controllers.Tests
         {
             using (var customersDataProvider = CreateCustomersDataProvider())
             {
-                //arrange
+                // arrange
                 var customersController = CreateTestCustomersController(customersDataProvider);
 
-                //act
+                // act
                 // Pass the ResourceManager explicitly since there's no global service provider to provide it
                 var result = await customersController.PostAsync(new CustomerDataTransferObject(), _serviceProvider.GetRequiredService<ResourceManager>());
 
-                //assert
+                // assert
                 Assert.Equal(CustomerInfoInvalidErrorText, result.Value);
                 Assert.Equal(StatusCodes.Status400BadRequest, result.StatusCode);
             }
@@ -149,7 +150,7 @@ namespace CustomerAPI.Controllers.Tests
         {
             using (var customersDataProvider = CreateCustomersDataProvider())
             {
-                //arrange
+                // arrange
                 var customersController = CreateTestCustomersController(customersDataProvider);
                 var newCustomer = new CustomerDataTransferObject
                 {
@@ -158,11 +159,11 @@ namespace CustomerAPI.Controllers.Tests
                     PhoneNumber = "555-555-5555"
                 };
 
-                //act
+                // act
                 // Pass the ResourceManager explicitly since there's no global service provider to provide it
-                var result = ((ObjectResult)await customersController.PostAsync(newCustomer, _serviceProvider.GetRequiredService<ResourceManager>()));
+                var result = await customersController.PostAsync(newCustomer, _serviceProvider.GetRequiredService<ResourceManager>());
 
-                //assert
+                // assert
                 Assert.Equal(StatusCodes.Status200OK, result.StatusCode);
                 var customersResult = customersController.Get();
                 Assert.Equal(1, customersResult.Count());
@@ -172,20 +173,20 @@ namespace CustomerAPI.Controllers.Tests
             }
         }
 
-        //Test PutAsync(Guid, CustomerUpdateInfo) Method
+        // Test PutAsync(Guid, CustomerUpdateInfo) Method
         [Fact]
         public async Task PutAsyncExistingCustomerWithBadUpdateInfoReturns400BadRequest()
         {
             using (var customersDataProvider = CreateTestCustomerDataProvider(SampleListOfCustomerDataTransferObjects))
             {
-                //arrange
+                // arrange
                 var customersController = CreateTestCustomersController(customersDataProvider);
 
-                //act
+                // act
                 var customerEntity = customersDataProvider.GetCustomers().First();
                 var result = await customersController.PutAsync(customerEntity.Id, new CustomerDataTransferObject());
 
-                //assert
+                // assert
                 Assert.Equal(StatusCodes.Status400BadRequest, result.StatusCode);
                 Assert.Equal(CustomerInfoInvalidErrorText, result.Value);
 
@@ -201,7 +202,7 @@ namespace CustomerAPI.Controllers.Tests
         {
             using (var customersDataProvider = CreateTestCustomerDataProvider(SampleListOfCustomerDataTransferObjects))
             {
-                //arrange
+                // arrange
                 var customersController = CreateTestCustomersController(customersDataProvider);
 
                 var customerUpdateInfo = new CustomerDataTransferObject
@@ -211,13 +212,13 @@ namespace CustomerAPI.Controllers.Tests
                     PhoneNumber = "555-555-5555"
                 };
 
-                //act
+                // act
                 var guid = Guid.NewGuid();
                 var result = await customersController.PutAsync(guid, customerUpdateInfo);
 
-                //assert
+                // assert
                 Assert.Equal(StatusCodes.Status404NotFound, result.StatusCode);
-                Assert.Equal(String.Format(CustomerNotFoundErrorText, guid), result.Value);
+                Assert.Equal(string.Format(CustomerNotFoundErrorText, guid), result.Value);
             }
         }
 
@@ -226,7 +227,7 @@ namespace CustomerAPI.Controllers.Tests
         {
             using (var customersDataProvider = CreateTestCustomerDataProvider(SampleListOfCustomerDataTransferObjects))
             {
-                //arrange
+                // arrange
                 var customersController = CreateTestCustomersController(customersDataProvider);
 
                 var customerUpdateInfo = new CustomerDataTransferObject
@@ -236,11 +237,11 @@ namespace CustomerAPI.Controllers.Tests
                     PhoneNumber = "555-555-5555"
                 };
 
-                //act
+                // act
                 var customerToUpdateId = customersDataProvider.GetCustomers().First().Id;
                 await customersController.PutAsync(customerToUpdateId, customerUpdateInfo);
 
-                //assert
+                // assert
                 var customerToUpdate = customersController.Get(customerToUpdateId);
                 Assert.NotNull(customerToUpdate);
                 Assert.Equal(StatusCodes.Status200OK, customerToUpdate.StatusCode);
@@ -249,22 +250,22 @@ namespace CustomerAPI.Controllers.Tests
             }
         }
 
-        //Test DeleteAsync(Guid) Method
+        // Test DeleteAsync(Guid) Method
         [Fact]
         public async Task DeleteAsyncNonExistingCustomerReturns404NotFound()
         {
             using (var customersDataProvider = CreateTestCustomerDataProvider(SampleListOfCustomerDataTransferObjects))
             {
-                //arrange
+                // arrange
                 var customersController = CreateTestCustomersController(customersDataProvider);
 
-                //act
+                // act
                 var guid = Guid.NewGuid();
                 var customerResult = await customersController.DeleteAsync(guid);
 
-                //assert
+                // assert
                 Assert.Equal(StatusCodes.Status404NotFound, customerResult.StatusCode);
-                Assert.Equal(String.Format(CustomerNotFoundErrorText, guid), customerResult.Value);
+                Assert.Equal(string.Format(CustomerNotFoundErrorText, guid), customerResult.Value);
             }
         }
 
@@ -273,22 +274,21 @@ namespace CustomerAPI.Controllers.Tests
         {
             using (var customersDataProvider = CreateTestCustomerDataProvider(SampleListOfCustomerDataTransferObjects))
             {
-                //arrange
+                // arrange
                 var customersController = CreateTestCustomersController(customersDataProvider);
 
-                //act
+                // act
                 var customerToRemoveId = customersDataProvider.GetCustomers().First().Id;
                 var customerResult = await customersController.DeleteAsync(customerToRemoveId);
 
-                //assert
+                // assert
                 Assert.Equal(StatusCodes.Status200OK, customerResult.StatusCode);
                 Assert.Equal(customerToRemoveId, ((CustomerEntity)customerResult.Value).Id);
                 Assert.Equal(StatusCodes.Status404NotFound,
-                             (customersController.Get(customerToRemoveId)).StatusCode);
+                             customersController.Get(customerToRemoveId).StatusCode);
             }
         }
 
-        #region TestHelpers
         internal override ICustomersDataProvider CreateCustomersDataProvider() => _serviceProvider.GetRequiredService<ICustomersDataProvider>();
 
         /// <summary>
@@ -299,11 +299,12 @@ namespace CustomerAPI.Controllers.Tests
             var controller = new CustomersController(customersDataProvider, _serviceProvider.GetRequiredService<ResourceManager>());
 
             // Set mock HTTP context (including DI service provider)
-            controller.ControllerContext.HttpContext = new DefaultHttpContext();
-            controller.ControllerContext.HttpContext.RequestServices = _serviceProvider;            
+            controller.ControllerContext.HttpContext = new DefaultHttpContext()
+            {
+                RequestServices = _serviceProvider
+            };
 
             return controller;
         }
-        #endregion
     }
 }

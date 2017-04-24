@@ -1,14 +1,16 @@
-﻿using CustomerAPI.Data;
+﻿// Licensed under the MIT license. See LICENSE file in the samples root for full license information.
+
+using CustomerAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace CustomerAPITests.CustomerDataProviders
+namespace CustomerAPI.CustomerDataProviders.Tests
 {
     public class EFCustomersDataProviderTests : BaseCustomerDataProviderTests
     {
         internal override ICustomersDataProvider CreateCustomersDataProvider()
         {
-            // Create a fresh service provider, and therefore a fresh 
+            // Create a fresh service provider, and therefore a fresh
             // InMemory database instance.
             var serviceProvider = new ServiceCollection()
                 .AddEntityFrameworkInMemoryDatabase()

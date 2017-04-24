@@ -1,11 +1,13 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿// Licensed under the MIT license. See LICENSE file in the samples root for full license information.
+
+using CustomersMVC.CustomersAPI;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Configuration;
 using System;
 using System.Net.Http;
-using CustomersMVC.CustomersAPI;
 
 namespace CustomersMVC
 {
@@ -63,7 +65,6 @@ namespace CustomersMVC
         /// <summary>
         /// Creates a CustomerApiService instance
         /// </summary>
-        /// <returns></returns>
         private CustomersAPIService CreateCustomersAPIService()
         {
             return new CustomersAPIService(CreateHttpClient());
@@ -74,10 +75,10 @@ namespace CustomersMVC
         /// </summary>
         private string GetCustomersAPIUrl()
         {
-            string endpoint = Configuration["CustomersAPIService:Url"];
+            var endpoint = Configuration["CustomersAPIService:Url"];
             if (string.IsNullOrEmpty(endpoint))
             {
-                throw new ArgumentNullException("CustomerAPIService", 
+                throw new ArgumentNullException("CustomerAPIService",
                                                 "Need to specify CustomerAPIService in appsettings.json");
             }
 
@@ -89,9 +90,11 @@ namespace CustomersMVC
         /// </summary>
         private HttpClient CreateHttpClient()
         {
-            var client = new HttpClient();
+            var client = new HttpClient()
+            {
+                BaseAddress = new Uri(GetCustomersAPIUrl())
+            };
 
-            client.BaseAddress = new Uri(GetCustomersAPIUrl());
             client.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "application/json");
             client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
             client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "AnalyzerStatusCheck");

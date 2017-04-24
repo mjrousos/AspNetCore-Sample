@@ -28,6 +28,20 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RequestCorrelation", "src\R
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{6E9172F3-2D5D-41D0-8CBD-A0DE51CFF72C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9C459866-AD4E-4BF4-ABF1-3BF707D9C400}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		CodeStyles.ruleset = CodeStyles.ruleset
+		CustomersHandsOnLab.html = CustomersHandsOnLab.html
+		dir.props = dir.props
+		dir.targets = dir.targets
+		LICENSE = LICENSE
+		README.md = README.md
+		stylecop.json = stylecop.json
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

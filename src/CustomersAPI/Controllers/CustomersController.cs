@@ -1,4 +1,6 @@
-﻿using CustomerAPI.Data;
+﻿// Licensed under the MIT license. See LICENSE file in the samples root for full license information.
+
+using CustomerAPI.Data;
 using CustomersShared.Data.DataEntities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -36,7 +38,7 @@ namespace CustomerAPI.Controllers
         [HttpGet("{id}")]
         public ObjectResult Get(Guid id)
         {
-            CustomerDataActionResult customerDataActionResult = _customersDataProvider.TryFindCustomer(id);
+            var customerDataActionResult = _customersDataProvider.TryFindCustomer(id);
 
             if (!customerDataActionResult.IsSuccess)
             {
@@ -51,9 +53,9 @@ namespace CustomerAPI.Controllers
         }
 
         // POST api/Customers
+        // Dependency Injection: using [FromService] is another way of requesting services from DI
         [HttpPost]
         public async Task<ObjectResult> PostAsync([FromBody]CustomerDataTransferObject customerDataTransferObject,
-                                                  // Dependency Injection: Another way of requesting services from DI is [FromServices]
                                                   [FromServices] ResourceManager resManager)
         {
             if (customerDataTransferObject == null || !customerDataTransferObject.ValidateCustomerDataTransferObject())
@@ -61,13 +63,11 @@ namespace CustomerAPI.Controllers
                 return BadRequest(resManager.GetString("CustomerInfoInvalid"));
             }
 
-            CustomerDataActionResult customerDataActionResult = 
-                await _customersDataProvider.TryAddCustomerAsync(customerDataTransferObject);
+            var customerDataActionResult = await _customersDataProvider.TryAddCustomerAsync(customerDataTransferObject);
 
             if (!customerDataActionResult.IsSuccess)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                                  resManager.GetString("UnexpectedServerError"));
+                return StatusCode(StatusCodes.Status500InternalServerError, resManager.GetString("UnexpectedServerError"));
             }
 
             return Ok(customerDataActionResult.CustomerEntity);
@@ -87,13 +87,11 @@ namespace CustomerAPI.Controllers
                 return new NotFoundObjectResult(string.Format(_resourceManager.GetString("CustomerNotFound"), id));
             }
 
-            CustomerDataActionResult customerDataActionResult = 
-                    await _customersDataProvider.TryUpdateCustomerAsync(id, customerDataTransferObject);
+            var customerDataActionResult = await _customersDataProvider.TryUpdateCustomerAsync(id, customerDataTransferObject);
 
             if (!customerDataActionResult.IsSuccess)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                                  _resourceManager.GetString("UnexpectedServerError"));
+                return StatusCode(StatusCodes.Status500InternalServerError, _resourceManager.GetString("UnexpectedServerError"));
             }
 
             return Ok(customerDataActionResult.CustomerEntity);
@@ -108,11 +106,10 @@ namespace CustomerAPI.Controllers
                 return new NotFoundObjectResult(string.Format(_resourceManager.GetString("CustomerNotFound"), id));
             }
 
-            CustomerDataActionResult customerDataActionResult = await _customersDataProvider.TryDeleteCustomerAsync(id);
+            var customerDataActionResult = await _customersDataProvider.TryDeleteCustomerAsync(id);
             if (!customerDataActionResult.IsSuccess)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                                  _resourceManager.GetString("UnexpectedServerError"));
+                return StatusCode(StatusCodes.Status500InternalServerError, _resourceManager.GetString("UnexpectedServerError"));
             }
 
             return Ok(customerDataActionResult.CustomerEntity);

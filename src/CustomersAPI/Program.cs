@@ -1,9 +1,11 @@
-﻿using System.IO;
-using Microsoft.AspNetCore.Hosting;
+﻿// Licensed under the MIT license. See LICENSE file in the samples root for full license information.
+
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using System.Resources;
+using System.IO;
 using System.Reflection;
+using System.Resources;
 
 namespace CustomerAPI
 {
@@ -13,6 +15,7 @@ namespace CustomerAPI
         {
             var host = new WebHostBuilder()
                 .UseKestrel()
+
                 // Dependency Injection: Services can be registered with the ASP.NET Core DI container at IWebHost build-time
                 // by calling ConfigureServices on the WebHostBuilder.
                 //
