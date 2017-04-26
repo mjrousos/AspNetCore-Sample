@@ -12,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using RequestCorrelation;
+using Serilog;
 using Swashbuckle.Swagger.Model;
 using System;
 using System.Diagnostics;
@@ -98,10 +99,33 @@ namespace CustomerAPI
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            // Add some logging options
-            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
+            // Logging: The ILoggerFactory is used to keep track of all the different loggers that have been added. When
+            //          using dependency injection to registered and can be accessed through dependency injection using the
+            //          ILogger interface. Here there are three loggers that are added to the loggerFactory instance.
             loggerFactory.AddDebug();
 
+            // Logging: Some third-party logger's like Serilog also have logging support for ASPNet Core. The Serilog.Extensions.Logging,
+            //          Serilog.Settings.Configuration and Serilog.Sinks.Literate packages have been added to this project. These
+            //          packages allow the application to use Serilog, set the configuration and then display it using Literate in
+            //          the console output. The below code creates a logger using the Serilog configuration in the AppSettings.json
+            //          file and then adds the logger to the LoggerFactory.
+            if (!env.IsDevelopment())
+            {
+                // Logging: Console loggers are very useful for debugging, but not performant and should be omitted in
+                //          production. See https://blogs.msdn.microsoft.com/webdev/2017/04/26/asp-net-core-logging/ for
+                //          logging into Azure App Service
+            }
+            else
+            {
+                var serilogLogger = new LoggerConfiguration()
+                                    .ReadFrom.Configuration(Configuration)
+                                    .CreateLogger();
+
+                loggerFactory.AddSerilog(serilogLogger);
+            }
+
+            // Logging: There is a logger created here that will log messages from the timing middleware to
+            //          all the loggers contained in the LoggerFactory.
             // Middleware: Trivial middleware registration to demonstrate how
             //             to add a step to the app's HTTP request processing pipeline.
             // Middleware: Note that middleware will execute in the pipeline in the order it is registered.

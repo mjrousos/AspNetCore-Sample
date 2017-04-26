@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\CustomersAPI\CustomersAPI.csproj" />
+    <ProjectReference Include="..\CustomersDemoTestHelpers\CustomersDemoTestHelpers.csproj" />
   </ItemGroup>
 
   <ItemGroup>

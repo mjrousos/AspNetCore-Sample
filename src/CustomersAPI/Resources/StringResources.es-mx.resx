@@ -123,6 +123,30 @@
   <data name="CustomerNotFound" xml:space="preserve">
     <value>No se pudo encontrar al cliente con el identificador de {0}</value>
   </data>
+  <data name="LoggingAddedCustomer" xml:space="preserve">
+    <value>Cliente {0} ha añadido</value>
+  </data>
+  <data name="LoggingAddingCustomer" xml:space="preserve">
+    <value>Agregar cliente  {0}</value>
+  </data>
+  <data name="LoggingDeletedCustomer" xml:space="preserve">
+    <value>Cliente con éxito suprimido {0}</value>
+  </data>
+  <data name="LoggingDeletingCustomer" xml:space="preserve">
+    <value>Eliminar cliente {0}</value>
+  </data>
+  <data name="LoggingGetCustomer" xml:space="preserve">
+    <value>Conseguir clientes {0}</value>
+  </data>
+  <data name="LoggingGetCustomers" xml:space="preserve">
+    <value>Lograr que los clientes</value>
+  </data>
+  <data name="LoggingUpdatedCustomer" xml:space="preserve">
+    <value>{0} de cliente actualizado correctamente</value>
+  </data>
+  <data name="LoggingUpdatingCustomer" xml:space="preserve">
+    <value>Actualización de cliente {0}</value>
+  </data>
   <data name="UnexpectedServerError" xml:space="preserve">
     <value>Algo inesperado salió mal durante la petición!</value>
   </data>

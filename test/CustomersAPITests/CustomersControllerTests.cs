@@ -2,10 +2,12 @@
 
 using CustomerAPI.CustomerDataProviders.Tests;
 using CustomerAPI.Data;
+using CustomersDemo.Tests.Helpers;
 using CustomersShared.Data.DataEntities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -18,9 +20,16 @@ namespace CustomerAPI.Controllers.Tests
     public class CustomersControllerTests : BaseCustomersDataProviderHelpers
     {
         private const string CustomerInfoInvalidErrorText = "CustomerInfo is not valid!";
-        private const string InternalServerErrorText = "Something unexpected went wrong during the request!";
+        private const string UnexpectedServerErrorText = "Something unexpected went wrong during the request!";
         private const string CustomerNotFoundErrorText = "Could not find customer with Id of {0}";
-
+        private const string LoggingAddedCustomerText = "PostAsync: Successfully added customer {0}";
+        private const string LoggingAddingCustomerText = "PostAsync: Adding customer {0}";
+        private const string LoggingDeletedCustomerText = "DeleteAsync: Successfully deleted customer {0}";
+        private const string LoggingDeletingCustomerText = "DeleteAsync: Deleting customer {0}";
+        private const string LoggingGetCustomerText = "Get: Getting customer {0}";
+        private const string LoggingGetCustomersText = "Get: Getting Customers";
+        private const string LoggingUpdatedCustomerText = "PutAsync: Successfully updated customer {0}";
+        private const string LoggingUpdatingCustomerText = "PutAsync: Updating customer {0}";
         private readonly IServiceProvider _serviceProvider;
 
         public CustomersControllerTests()
@@ -45,13 +54,16 @@ namespace CustomerAPI.Controllers.Tests
             using (var customersDataProvider = CreateCustomersDataProvider())
             {
                 // arrange
-                var customersController = CreateTestCustomersController(customersDataProvider);
+                // Logging: passing in a test logger to verify in unit tests that the logging is correct
+                var testLogger = CreateTestLogger();
+                var customersController = CreateTestCustomersController(customersDataProvider, testLogger);
 
                 // act
                 var result = customersController.Get();
 
                 // assert
                 Assert.Equal(0, result.Count());
+                VerifyOnlyLogMessage(testLogger, LoggingGetCustomersText);
             }
         }
 
@@ -61,7 +73,8 @@ namespace CustomerAPI.Controllers.Tests
             using (var customersDataProvider = CreateTestCustomerDataProvider(SampleListOfCustomerDataTransferObjects))
             {
                 // arrange
-                var customersController = CreateTestCustomersController(customersDataProvider);
+                var testLogger = CreateTestLogger();
+                var customersController = CreateTestCustomersController(customersDataProvider, testLogger);
 
                 // act
                 var result = customersController.Get();
@@ -69,6 +82,7 @@ namespace CustomerAPI.Controllers.Tests
                 // assert
                 Assert.Equal(SampleListOfCustomerDataTransferObjects.Count(), result.Count());
                 CompareCustomerLists(SampleListOfCustomerDataTransferObjects, result);
+                VerifyOnlyLogMessage(testLogger, LoggingGetCustomersText);
             }
         }
 
@@ -79,14 +93,22 @@ namespace CustomerAPI.Controllers.Tests
             using (var customersDataProvider = CreateTestCustomerDataProvider(SampleListOfCustomerDataTransferObjects))
             {
                 // arrange
-                var customersController = CreateTestCustomersController(customersDataProvider);
+                var testLogger = CreateTestLogger();
+                var customersController = CreateTestCustomersController(customersDataProvider, testLogger);
 
                 // act
                 var guid = Guid.NewGuid();
                 var result = customersController.Get(guid);
 
+                // assert
+                var expectedErrorMessage = string.Format(CustomerNotFoundErrorText, guid);
                 Assert.Equal(StatusCodes.Status404NotFound, result.StatusCode);
-                Assert.Equal(string.Format(CustomerNotFoundErrorText, guid), result.Value);
+                Assert.Equal(expectedErrorMessage, result.Value);
+
+                // assert logging
+                Assert.Equal(2, testLogger.LoggedMessages.Count);
+                VerifyLogMessage(testLogger, string.Format(LoggingGetCustomerText, guid), LogLevel.Information, 0);
+                VerifyLogMessage(testLogger, $"Get: {expectedErrorMessage}", LogLevel.Error, 1);
             }
         }
 
@@ -96,14 +118,17 @@ namespace CustomerAPI.Controllers.Tests
             using (var customersDataProvider = CreateTestCustomerDataProvider(SampleListOfCustomerDataTransferObjects))
             {
                 // arrange
-                var customersController = CreateTestCustomersController(customersDataProvider);
+                var testLogger = CreateTestLogger();
+                var customersController = CreateTestCustomersController(customersDataProvider, testLogger);
 
                 // act
                 foreach (var customer in customersDataProvider.GetCustomers())
                 {
+                    testLogger.ClearMessages();
                     var result = customersController.Get(customer.Id);
                     Assert.Equal(StatusCodes.Status200OK, result.StatusCode);
                     Assert.Equal(customer.Id, ((CustomerEntity)result.Value).Id);
+                    VerifyOnlyLogMessage(testLogger, string.Format(LoggingGetCustomerText, customer.Id));
                 }
             }
         }
@@ -115,7 +140,8 @@ namespace CustomerAPI.Controllers.Tests
             using (var customersDataProvider = CreateCustomersDataProvider())
             {
                 // arrange
-                var customersController = CreateTestCustomersController(customersDataProvider);
+                var testLogger = CreateTestLogger();
+                var customersController = CreateTestCustomersController(customersDataProvider, testLogger);
 
                 // act
                 // Pass the ResourceManager explicitly since there's no global service provider to provide it
@@ -124,6 +150,7 @@ namespace CustomerAPI.Controllers.Tests
                 // assert
                 Assert.Equal(CustomerInfoInvalidErrorText, result.Value);
                 Assert.Equal(StatusCodes.Status400BadRequest, result.StatusCode);
+                VerifyOnlyLogMessage(testLogger, $"PostAsync: {CustomerInfoInvalidErrorText}", LogLevel.Error);
             }
         }
 
@@ -133,7 +160,8 @@ namespace CustomerAPI.Controllers.Tests
             using (var customersDataProvider = CreateCustomersDataProvider())
             {
                 // arrange
-                var customersController = CreateTestCustomersController(customersDataProvider);
+                var testLogger = CreateTestLogger();
+                var customersController = CreateTestCustomersController(customersDataProvider, testLogger);
 
                 // act
                 // Pass the ResourceManager explicitly since there's no global service provider to provide it
@@ -142,6 +170,7 @@ namespace CustomerAPI.Controllers.Tests
                 // assert
                 Assert.Equal(CustomerInfoInvalidErrorText, result.Value);
                 Assert.Equal(StatusCodes.Status400BadRequest, result.StatusCode);
+                VerifyOnlyLogMessage(testLogger, $"PostAsync: {CustomerInfoInvalidErrorText}", LogLevel.Error);
             }
         }
 
@@ -151,7 +180,8 @@ namespace CustomerAPI.Controllers.Tests
             using (var customersDataProvider = CreateCustomersDataProvider())
             {
                 // arrange
-                var customersController = CreateTestCustomersController(customersDataProvider);
+                var testLogger = CreateTestLogger();
+                var customersController = CreateTestCustomersController(customersDataProvider, testLogger);
                 var newCustomer = new CustomerDataTransferObject
                 {
                     FirstName = "Jon",
@@ -163,8 +193,16 @@ namespace CustomerAPI.Controllers.Tests
                 // Pass the ResourceManager explicitly since there's no global service provider to provide it
                 var result = await customersController.PostAsync(newCustomer, _serviceProvider.GetRequiredService<ResourceManager>());
 
-                // assert
+                // assert status code
                 Assert.Equal(StatusCodes.Status200OK, result.StatusCode);
+
+                // assert logging
+                var customerName = $"{newCustomer.FirstName} {newCustomer.LastName}";
+                Assert.Equal(2, testLogger.LoggedMessages.Count);
+                VerifyLogMessage(testLogger, string.Format(LoggingAddingCustomerText, customerName));
+                VerifyLogMessage(testLogger, string.Format(LoggingAddedCustomerText, customerName), LogLevel.Information, 1);
+
+                // assert customer was added
                 var customersResult = customersController.Get();
                 Assert.Equal(1, customersResult.Count());
                 var customerResult = customersResult.First();
@@ -180,7 +218,8 @@ namespace CustomerAPI.Controllers.Tests
             using (var customersDataProvider = CreateTestCustomerDataProvider(SampleListOfCustomerDataTransferObjects))
             {
                 // arrange
-                var customersController = CreateTestCustomersController(customersDataProvider);
+                var testLogger = CreateTestLogger();
+                var customersController = CreateTestCustomersController(customersDataProvider, testLogger);
 
                 // act
                 var customerEntity = customersDataProvider.GetCustomers().First();
@@ -189,6 +228,7 @@ namespace CustomerAPI.Controllers.Tests
                 // assert
                 Assert.Equal(StatusCodes.Status400BadRequest, result.StatusCode);
                 Assert.Equal(CustomerInfoInvalidErrorText, result.Value);
+                VerifyOnlyLogMessage(testLogger, $"PutAsync: {CustomerInfoInvalidErrorText}", LogLevel.Error);
 
                 var getCustomerResult = customersController.Get(customerEntity.Id);
                 Assert.Equal(StatusCodes.Status200OK, getCustomerResult.StatusCode);
@@ -203,7 +243,8 @@ namespace CustomerAPI.Controllers.Tests
             using (var customersDataProvider = CreateTestCustomerDataProvider(SampleListOfCustomerDataTransferObjects))
             {
                 // arrange
-                var customersController = CreateTestCustomersController(customersDataProvider);
+                var testLogger = CreateTestLogger();
+                var customersController = CreateTestCustomersController(customersDataProvider, testLogger);
 
                 var customerUpdateInfo = new CustomerDataTransferObject
                 {
@@ -217,8 +258,10 @@ namespace CustomerAPI.Controllers.Tests
                 var result = await customersController.PutAsync(guid, customerUpdateInfo);
 
                 // assert
+                var expectedErrorMessage = string.Format(CustomerNotFoundErrorText, guid);
                 Assert.Equal(StatusCodes.Status404NotFound, result.StatusCode);
-                Assert.Equal(string.Format(CustomerNotFoundErrorText, guid), result.Value);
+                Assert.Equal(expectedErrorMessage, result.Value);
+                VerifyLogMessage(testLogger, $"PutAsync: {expectedErrorMessage}", LogLevel.Error, 1);
             }
         }
 
@@ -228,7 +271,8 @@ namespace CustomerAPI.Controllers.Tests
             using (var customersDataProvider = CreateTestCustomerDataProvider(SampleListOfCustomerDataTransferObjects))
             {
                 // arrange
-                var customersController = CreateTestCustomersController(customersDataProvider);
+                var testLogger = CreateTestLogger();
+                var customersController = CreateTestCustomersController(customersDataProvider, testLogger);
 
                 var customerUpdateInfo = new CustomerDataTransferObject
                 {
@@ -241,7 +285,12 @@ namespace CustomerAPI.Controllers.Tests
                 var customerToUpdateId = customersDataProvider.GetCustomers().First().Id;
                 await customersController.PutAsync(customerToUpdateId, customerUpdateInfo);
 
-                // assert
+                // assert logging
+                Assert.Equal(2, testLogger.LoggedMessages.Count);
+                VerifyLogMessage(testLogger, string.Format(LoggingUpdatingCustomerText, customerToUpdateId));
+                VerifyLogMessage(testLogger, string.Format(LoggingUpdatedCustomerText, customerToUpdateId), LogLevel.Information, 1);
+
+                // assert information updated
                 var customerToUpdate = customersController.Get(customerToUpdateId);
                 Assert.NotNull(customerToUpdate);
                 Assert.Equal(StatusCodes.Status200OK, customerToUpdate.StatusCode);
@@ -257,15 +306,18 @@ namespace CustomerAPI.Controllers.Tests
             using (var customersDataProvider = CreateTestCustomerDataProvider(SampleListOfCustomerDataTransferObjects))
             {
                 // arrange
-                var customersController = CreateTestCustomersController(customersDataProvider);
+                var testLogger = CreateTestLogger();
+                var customersController = CreateTestCustomersController(customersDataProvider, testLogger);
 
                 // act
                 var guid = Guid.NewGuid();
                 var customerResult = await customersController.DeleteAsync(guid);
 
                 // assert
+                var expectedErrorMessage = string.Format(CustomerNotFoundErrorText, guid);
                 Assert.Equal(StatusCodes.Status404NotFound, customerResult.StatusCode);
-                Assert.Equal(string.Format(CustomerNotFoundErrorText, guid), customerResult.Value);
+                Assert.Equal(expectedErrorMessage, customerResult.Value);
+                VerifyLogMessage(testLogger, $"DeleteAsync: {expectedErrorMessage}", LogLevel.Error, 1);
             }
         }
 
@@ -275,13 +327,19 @@ namespace CustomerAPI.Controllers.Tests
             using (var customersDataProvider = CreateTestCustomerDataProvider(SampleListOfCustomerDataTransferObjects))
             {
                 // arrange
-                var customersController = CreateTestCustomersController(customersDataProvider);
+                var testLogger = CreateTestLogger();
+                var customersController = CreateTestCustomersController(customersDataProvider, testLogger);
 
                 // act
                 var customerToRemoveId = customersDataProvider.GetCustomers().First().Id;
                 var customerResult = await customersController.DeleteAsync(customerToRemoveId);
 
-                // assert
+                // assert logging
+                Assert.Equal(2, testLogger.LoggedMessages.Count);
+                VerifyLogMessage(testLogger, string.Format(LoggingDeletingCustomerText, customerToRemoveId));
+                VerifyLogMessage(testLogger, string.Format(LoggingDeletedCustomerText, customerToRemoveId), LogLevel.Information, 1);
+
+                // assert customer removed
                 Assert.Equal(StatusCodes.Status200OK, customerResult.StatusCode);
                 Assert.Equal(customerToRemoveId, ((CustomerEntity)customerResult.Value).Id);
                 Assert.Equal(StatusCodes.Status404NotFound,
@@ -292,11 +350,11 @@ namespace CustomerAPI.Controllers.Tests
         internal override ICustomersDataProvider CreateCustomersDataProvider() => _serviceProvider.GetRequiredService<ICustomersDataProvider>();
 
         /// <summary>
-        /// Creates a test CustomersController to test with
+        /// Creates a test instance of the CustomersController passing in a ICustomersDataProvider, ResourceManager and ILogger
         /// </summary>
-        private CustomersController CreateTestCustomersController(ICustomersDataProvider customersDataProvider)
+        private CustomersController CreateTestCustomersController(ICustomersDataProvider customersDataProvider, TestLogger<CustomersController> testLogger)
         {
-            var controller = new CustomersController(customersDataProvider, _serviceProvider.GetRequiredService<ResourceManager>());
+            var controller = new CustomersController(customersDataProvider, _serviceProvider.GetRequiredService<ResourceManager>(), testLogger);
 
             // Set mock HTTP context (including DI service provider)
             controller.ControllerContext.HttpContext = new DefaultHttpContext()
@@ -305,6 +363,41 @@ namespace CustomerAPI.Controllers.Tests
             };
 
             return controller;
+        }
+
+        /// <summary>
+        /// Logging: An example of asserting logging information from a controller.
+        /// Verifies there is only one logged message in the TestLogger and verifies the information in the logged message
+        /// </summary>
+        /// <param name="testLogger"></param>
+        /// <param name="expectedMessage"></param>
+        /// <param name="expectedLogLevel"></param>
+        private void VerifyOnlyLogMessage(TestLogger<CustomersController> testLogger,
+                                          string expectedMessage,
+                                          LogLevel expectedLogLevel = LogLevel.Information)
+        {
+            Assert.Equal(1, testLogger.LoggedMessages.Count);
+            VerifyLogMessage(testLogger, expectedMessage, expectedLogLevel, 0);
+        }
+
+        /// <summary>
+        /// Verifies a single log message in the TestLogger
+        /// </summary>
+        /// <param name="testLogger">TestLogger object</param>
+        /// <param name="expectedMessage">Expected message of the indexed log message</param>
+        /// <param name="expectedLogLevel">Expected log level of the indexed log message</param>
+        /// <param name="logMessageIndexToVerify">Which index in the logged messages to verify</param>
+        private void VerifyLogMessage(TestLogger<CustomersController> testLogger,
+                                      string expectedMessage,
+                                      LogLevel expectedLogLevel = LogLevel.Information,
+                                      int logMessageIndexToVerify = 0)
+        {
+            Assert.Equal(testLogger.BuildLogString(expectedLogLevel, expectedMessage), testLogger.LoggedMessages[logMessageIndexToVerify]);
+        }
+
+        public TestLogger<CustomersController> CreateTestLogger()
+        {
+            return new TestLogger<CustomersController>();
         }
     }
 }
