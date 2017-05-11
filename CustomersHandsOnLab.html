@@ -7,7 +7,7 @@
     <style>
         h2 {
             color: lightskyblue;
-            text-align:center;
+            text-align: center;
         }
 
         h4 {
@@ -282,107 +282,108 @@
             <tab1>&lt;/div&gt;</tab1><br />
             &lt;/div&gt;<br />
         </div>
+    </div>
 
-        <div>
-            <h4>Add ability to add customers</h4>
-            <ul><li>Replace existing AddCustomer method in the HomeController with the following two methods</li></ul>
-            <div id="codeblock">
-                public IActionResult AddCustomer()<br />
-                {<br />
-                <tab1>return View();</tab1><br />
-                }<br />
-                <br />
-                [HttpPost]<br />
-                public async Task&lt;IActionResult&gt; AddCustomer(CustomerEntity customer)<br />
-                {<br />
-                <tab1>if (ModelState.IsValid)</tab1><br />
-                <tab1>{</tab1><br />
-                <tab2>await _customersService.AddCustomerAsync(customer);</tab2><br />
-                <tab2>return RedirectToAction("CustomersList");</tab2><br />
-                <tab1>}</tab1><br />
-                <br />
-                <tab1>return View(customer);</tab1><br />
-                }<br />
-            </div>
-        </div>
-
-        <ul><li>Add following import into _ViewImports</li></ul>
-        <div id="codeblock">@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers</div>
-
-        <ul><li>Add a new View under the views\Home folder with the following content</li></ul>
+    <div>
+        <h4>Add ability to add customers</h4>
+        <ul><li>Replace existing AddCustomer method in the HomeController with the following two methods</li></ul>
         <div id="codeblock">
-            @model CustomerEntity<br />
-            <br />
-            @{<br />
-            <tab1>ViewBag.Title = "Add Customer";</tab1><br />
+            public IActionResult AddCustomer()<br />
+            {<br />
+            <tab1>return View();</tab1><br />
             }<br />
             <br />
-            &lt;form asp-controller="Home" asp-action="AddCustomer" method="post" class="form-horizontal" role="form"&gt;<br />
-            <tab1>&lt;div class="form-horizontal"&gt;</tab1><br />
-            <tab2>&lt;div asp-validation-summary="All" class="text-danger"&gt;&lt;/div&gt;</tab2><br />
-            <tab3>&lt;div class="form-group"&gt;</tab3><br />
-            <tab4>&lt;label asp-for="Id" class="col-md-2 control-label"&gt;&lt;/label&gt;</tab4><br />
-            <tab4>&lt;div class="col-md-10"&gt;</tab4><br />
-            <tab5>&lt;input asp-for="Id" class="form-control" /&gt;</tab5><br />
-            <tab5>&lt;span asp-validation-for="Id" class="text-danger"&gt;&lt;/span&gt;</tab5><br />
-            <tab4>&lt;/div&gt;</tab4><br />
-            <tab3>&lt;/div&gt;</tab3><br />
-            <tab3>&lt;div class="form-group"&gt;</tab3><br />
-            <tab4>&lt;label asp-for="FirstName" class="col-md-2 control-label"&gt;&lt;/label&gt;</tab4><br />
-            <tab4>&lt;div class="col-md-10"&gt;</tab4><br />
-            <tab5>&lt;input asp-for="FirstName" class="form-control" /&gt;</tab5><br />
-            <tab5>&lt;span asp-validation-for="FirstName" class="text-danger"&gt;&lt;/span&gt;</tab5><br />
-            <tab4>&lt;/div&gt;</tab4><br />
-            <tab3>&lt;/div&gt;</tab3><br />
-            <tab3>&lt;div class="form-group"&gt;</tab3><br />
-            <tab4>&lt;label asp-for="LastName" class="col-md-2 control-label"&gt;&lt;/label&gt;</tab4><br />
-            <tab4>&lt;div class="col-md-10"&gt;</tab4><br />
-            <tab5>&lt;input asp-for="LastName" class="form-control" /&gt;</tab5><br />
-            <tab5>&lt;span asp-validation-for="LastName" class="text-danger"&gt;&lt;/span&gt;</tab5><br />
-            <tab4>&lt;/div&gt;</tab4><br />
-            <tab3>&lt;/div&gt;</tab3><br />
-            <tab3>&lt;div class="form-group"&gt;</tab3><br />
-            <tab4>&lt;label asp-for="PhoneNumber" class="col-md-2 control-label"&gt;&lt;/label&gt;</tab4><br />
-            <tab4>&lt;div class="col-md-10"&gt;</tab4><br />
-            <tab5>&lt;input asp-for="PhoneNumber" class="form-control" /&gt;</tab5><br />
-            <tab5>&lt;span asp-validation-for="PhoneNumber" class="text-danger"&gt;&lt;/span&gt;</tab5><br />
-            <tab4>&lt;/div&gt;</tab4><br />
-            <tab3>&lt;/div&gt;</tab3><br />
-            <tab3>&lt;div class="form-group"&gt;</tab3><br />
-            <tab4>&lt;label asp-for="Address" class="col-md-2 control-label"&gt;&lt;/label&gt;</tab4><br />
-            <tab4>&lt;div class="col-md-10"&gt;</tab4><br />
-            <tab5>&lt;input asp-for="Address" class="form-control" /&gt;</tab5><br />
-            <tab5>&lt;span asp-validation-for="Address" class="text-danger"&gt;&lt;/span&gt;</tab5><br />
-            <tab4>&lt;/div&gt;</tab4><br />
-            <tab3>&lt;/div&gt;</tab3><br />
-            <tab3>&lt;div class="form-group"&gt;</tab3><br />
-            <tab4>&lt;label asp-for="City" class="col-md-2 control-label"&gt;&lt;/label&gt;</tab4><br />
-            <tab4>&lt;div class="col-md-10"&gt;</tab4><br />
-            <tab5>&lt;input asp-for="City" class="form-control" /&gt;</tab5><br />
-            <tab5>&lt;span asp-validation-for="City" class="text-danger"&gt;&lt;/span&gt;</tab5><br />
-            <tab4>&lt;/div&gt;</tab4><br />
-            <tab3>&lt;/div&gt;</tab3><br />
-            <tab3>&lt;div class="form-group"&gt;</tab3><br />
-            <tab4>&lt;label asp-for="State" class="col-md-2 control-label"&gt;&lt;/label&gt;</tab4><br />
-            <tab4>&lt;div class="col-md-10"&gt;</tab4><br />
-            <tab5>&lt;input asp-for="State" class="form-control" /&gt;</tab5><br />
-            <tab5>&lt;span asp-validation-for="State" class="text-danger"&gt;&lt;/span&gt;</tab5><br />
-            <tab4>&lt;/div&gt;</tab4><br />
-            <tab3>&lt;/div&gt;</tab3><br />
-            <tab3>&lt;div class="form-group"&gt;</tab3><br />
-            <tab4>&lt;label asp-for="ZipCode" class="col-md-2 control-label"&gt;&lt;/label&gt;</tab4><br />
-            <tab4>&lt;div class="col-md-10"&gt;</tab4><br />
-            <tab5>&lt;input asp-for="ZipCode" class="form-control" /&gt;</tab5><br />
-            <tab5>&lt;span asp-validation-for="ZipCode" class="text-danger"&gt;&lt;/span&gt;</tab5><br />
-            <tab4>&lt;/div&gt;</tab4><br />
-            <tab3>&lt;/div&gt;</tab3><br />
-            <tab3>&lt;div class="form-group"&gt;</tab3><br />
-            <tab4>&lt;div class="col-md-offset-2 col-md-10"&gt;</tab4><br />
-            <tab4>&lt;input type="submit" value="AddCustomer" class="btn btn-default" /&gt;</tab4><br />
-            <tab3>&lt;/div&gt;</tab3><br />
-            <tab2>&lt;/div&gt;</tab2><br />
-            <tab1>&lt;/div&gt;</tab1><br />
-            &lt;/form&gt;
+            [HttpPost]<br />
+            public async Task&lt;IActionResult&gt; AddCustomer(CustomerEntity customer)<br />
+            {<br />
+            <tab1>if (ModelState.IsValid)</tab1><br />
+            <tab1>{</tab1><br />
+            <tab2>await _customersService.AddCustomerAsync(customer);</tab2><br />
+            <tab2>return RedirectToAction("CustomersList");</tab2><br />
+            <tab1>}</tab1><br />
+            <br />
+            <tab1>return View(customer);</tab1><br />
+            }<br />
         </div>
+    </div>
+
+    <ul><li>Add following import into _ViewImports</li></ul>
+    <div id="codeblock">@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers</div>
+
+    <ul><li>Add a new View under the views\Home folder with the following content</li></ul>
+    <div id="codeblock">
+        @model CustomerEntity<br />
+        <br />
+        @{<br />
+        <tab1>ViewBag.Title = "Add Customer";</tab1><br />
+        }<br />
+        <br />
+        &lt;form asp-controller="Home" asp-action="AddCustomer" method="post" class="form-horizontal" role="form"&gt;<br />
+        <tab1>&lt;div class="form-horizontal"&gt;</tab1><br />
+        <tab2>&lt;div asp-validation-summary="All" class="text-danger"&gt;&lt;/div&gt;</tab2><br />
+        <tab3>&lt;div class="form-group"&gt;</tab3><br />
+        <tab4>&lt;label asp-for="Id" class="col-md-2 control-label"&gt;&lt;/label&gt;</tab4><br />
+        <tab4>&lt;div class="col-md-10"&gt;</tab4><br />
+        <tab5>&lt;input asp-for="Id" class="form-control" /&gt;</tab5><br />
+        <tab5>&lt;span asp-validation-for="Id" class="text-danger"&gt;&lt;/span&gt;</tab5><br />
+        <tab4>&lt;/div&gt;</tab4><br />
+        <tab3>&lt;/div&gt;</tab3><br />
+        <tab3>&lt;div class="form-group"&gt;</tab3><br />
+        <tab4>&lt;label asp-for="FirstName" class="col-md-2 control-label"&gt;&lt;/label&gt;</tab4><br />
+        <tab4>&lt;div class="col-md-10"&gt;</tab4><br />
+        <tab5>&lt;input asp-for="FirstName" class="form-control" /&gt;</tab5><br />
+        <tab5>&lt;span asp-validation-for="FirstName" class="text-danger"&gt;&lt;/span&gt;</tab5><br />
+        <tab4>&lt;/div&gt;</tab4><br />
+        <tab3>&lt;/div&gt;</tab3><br />
+        <tab3>&lt;div class="form-group"&gt;</tab3><br />
+        <tab4>&lt;label asp-for="LastName" class="col-md-2 control-label"&gt;&lt;/label&gt;</tab4><br />
+        <tab4>&lt;div class="col-md-10"&gt;</tab4><br />
+        <tab5>&lt;input asp-for="LastName" class="form-control" /&gt;</tab5><br />
+        <tab5>&lt;span asp-validation-for="LastName" class="text-danger"&gt;&lt;/span&gt;</tab5><br />
+        <tab4>&lt;/div&gt;</tab4><br />
+        <tab3>&lt;/div&gt;</tab3><br />
+        <tab3>&lt;div class="form-group"&gt;</tab3><br />
+        <tab4>&lt;label asp-for="PhoneNumber" class="col-md-2 control-label"&gt;&lt;/label&gt;</tab4><br />
+        <tab4>&lt;div class="col-md-10"&gt;</tab4><br />
+        <tab5>&lt;input asp-for="PhoneNumber" class="form-control" /&gt;</tab5><br />
+        <tab5>&lt;span asp-validation-for="PhoneNumber" class="text-danger"&gt;&lt;/span&gt;</tab5><br />
+        <tab4>&lt;/div&gt;</tab4><br />
+        <tab3>&lt;/div&gt;</tab3><br />
+        <tab3>&lt;div class="form-group"&gt;</tab3><br />
+        <tab4>&lt;label asp-for="Address" class="col-md-2 control-label"&gt;&lt;/label&gt;</tab4><br />
+        <tab4>&lt;div class="col-md-10"&gt;</tab4><br />
+        <tab5>&lt;input asp-for="Address" class="form-control" /&gt;</tab5><br />
+        <tab5>&lt;span asp-validation-for="Address" class="text-danger"&gt;&lt;/span&gt;</tab5><br />
+        <tab4>&lt;/div&gt;</tab4><br />
+        <tab3>&lt;/div&gt;</tab3><br />
+        <tab3>&lt;div class="form-group"&gt;</tab3><br />
+        <tab4>&lt;label asp-for="City" class="col-md-2 control-label"&gt;&lt;/label&gt;</tab4><br />
+        <tab4>&lt;div class="col-md-10"&gt;</tab4><br />
+        <tab5>&lt;input asp-for="City" class="form-control" /&gt;</tab5><br />
+        <tab5>&lt;span asp-validation-for="City" class="text-danger"&gt;&lt;/span&gt;</tab5><br />
+        <tab4>&lt;/div&gt;</tab4><br />
+        <tab3>&lt;/div&gt;</tab3><br />
+        <tab3>&lt;div class="form-group"&gt;</tab3><br />
+        <tab4>&lt;label asp-for="State" class="col-md-2 control-label"&gt;&lt;/label&gt;</tab4><br />
+        <tab4>&lt;div class="col-md-10"&gt;</tab4><br />
+        <tab5>&lt;input asp-for="State" class="form-control" /&gt;</tab5><br />
+        <tab5>&lt;span asp-validation-for="State" class="text-danger"&gt;&lt;/span&gt;</tab5><br />
+        <tab4>&lt;/div&gt;</tab4><br />
+        <tab3>&lt;/div&gt;</tab3><br />
+        <tab3>&lt;div class="form-group"&gt;</tab3><br />
+        <tab4>&lt;label asp-for="ZipCode" class="col-md-2 control-label"&gt;&lt;/label&gt;</tab4><br />
+        <tab4>&lt;div class="col-md-10"&gt;</tab4><br />
+        <tab5>&lt;input asp-for="ZipCode" class="form-control" /&gt;</tab5><br />
+        <tab5>&lt;span asp-validation-for="ZipCode" class="text-danger"&gt;&lt;/span&gt;</tab5><br />
+        <tab4>&lt;/div&gt;</tab4><br />
+        <tab3>&lt;/div&gt;</tab3><br />
+        <tab3>&lt;div class="form-group"&gt;</tab3><br />
+        <tab4>&lt;div class="col-md-offset-2 col-md-10"&gt;</tab4><br />
+        <tab4>&lt;input type="submit" value="AddCustomer" class="btn btn-default" /&gt;</tab4><br />
+        <tab3>&lt;/div&gt;</tab3><br />
+        <tab2>&lt;/div&gt;</tab2><br />
+        <tab1>&lt;/div&gt;</tab1><br />
+        &lt;/form&gt;
+    </div>
 </body>
 </html>
