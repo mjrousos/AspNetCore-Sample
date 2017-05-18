@@ -41,7 +41,12 @@ namespace CustomerAPI.Controllers
         {
             // Logging: Messages are logged using the logger that was dependency-injected. This call logs information
             //          to all the loggers added into the LoggerFactory.
-            _logger.LogInformation(BuildLogInfo(nameof(Get),  "LoggingGetCustomers"));
+            //
+            // Logging: This is also an example of semantic or structured logging. The message string contains
+            // placeholders which are replaced by the passed in parameters. This is nice because it provides
+            // the parameters to the logging provider which can write out the parameters in a structured making
+            // querying the log output easier.
+            _logger.LogInformation("{methodName}: {message}", nameof(Get), _resourceManager.GetString("LoggingGetCustomers"));
             return _customersDataProvider.GetCustomers();
         }
 
