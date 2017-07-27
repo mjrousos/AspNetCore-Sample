@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 
 services:
   # Each Docker container that's part of the app

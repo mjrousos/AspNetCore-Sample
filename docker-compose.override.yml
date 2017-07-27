@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 
 # Additional docker-compose files like this one can
 # contain environment-specific settings to easily deploy

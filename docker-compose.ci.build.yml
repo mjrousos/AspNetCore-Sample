@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 
 # This docker-compose file is not for running the app. Instead, it's for building the application
 # within a container. This has the benefit of building in a known environment so that:
