@@ -68,7 +68,7 @@ namespace CustomerAPI
 
             // Add Entity Framework Customers data provider
             services.AddDbContext<EFCustomersDataProvider>(options =>
-                options.UseInMemoryDatabase());
+                options.UseInMemoryDatabase("CustomerDataDb"));
 
             // Dependency Injection: This could be added directly to services (via AddScoped),
             // but in this sample we're adding it to the Autofac container in order to
