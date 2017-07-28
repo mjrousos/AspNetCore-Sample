@@ -11,7 +11,13 @@ services:
       - "80"
 
   customersmvc:
+    # Environment variables can be specified here.
+    # Notice that : can be replaced with __
+    # 
+    # Note also that this URL refers to our container
+    # using its service name.
     environment:
+      - CustomersAPIService__Url=http://customersapi
       - ASPNETCORE_ENVIRONMENT=Development
     ports:
       - "80"
