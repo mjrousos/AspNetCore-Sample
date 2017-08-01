@@ -3,6 +3,7 @@
 using CustomersMVC.Customers;
 using CustomersMVC.CustomersAPI;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using RequestCorrelation;
 using System;
 using System.Linq;
@@ -13,16 +14,23 @@ namespace CustomersMVC.Controllers
     public class HomeController : Controller
     {
         private readonly CustomersAPIService _customersService;
+        private readonly IOptions<HomeControllerOptions> _homeControllerOptions;
 
-        public HomeController(CustomersAPIService customersService)
+        // Configuration: Here the HomeControllerOptions are dependency injected into the home controller. These options
+        //                are then passed into the Index view to be used there as well.
+        public HomeController(CustomersAPIService customersService, IOptions<HomeControllerOptions> homeControllerOptions)
         {
             _customersService = customersService;
+            _homeControllerOptions = homeControllerOptions;
         }
 
         [Route("")]
         public IActionResult Index()
         {
-            return View();
+            // Configuration: Here we are passing the IOptions<HomeControllerOptions> into the view to be used for the model in the view.
+            //                This allows us to use whatever options and setting we want in a strongly typed way in the view as well
+            //                as in the controller.
+            return View("Index", _homeControllerOptions);
         }
 
         [Route("[Controller]/[Action]")]

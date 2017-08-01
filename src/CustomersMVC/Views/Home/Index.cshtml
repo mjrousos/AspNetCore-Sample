@@ -1,7 +1,13 @@
-﻿@{
-    ViewBag.Title = "Customers Home Page";
+﻿@*Configuration: Here we are passing in the IOptions from the controller and using it for the Title*@
+@using Microsoft.Extensions.Options;
+@using CustomersMVC;
+
+@model IOptions<HomeControllerOptions>
+
+@{
+    ViewBag.Title = Model.Value.Title;
 }
 <div style="color:lightblue">
-    Welcome to the customers demo. This showcases an MVC application calling into a WebApi application. It
+    Welcome to the @Model.Value.Title. This showcases an MVC application calling into a WebApi application. It
     also shows off some of the cool new features of .NET Core.
 </div>

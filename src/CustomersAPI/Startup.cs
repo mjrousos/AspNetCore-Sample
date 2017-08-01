@@ -15,6 +15,7 @@ using RequestCorrelation;
 using Serilog;
 using Swashbuckle.Swagger.Model;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Threading.Tasks;
@@ -27,12 +28,26 @@ namespace CustomerAPI
 
         public Startup(IHostingEnvironment env)
         {
-            // This section adds in configuration from different configuration sources including
-            // .json files and environment variables
+            // Configuration: In this section we are adding configuration from different sources including environment
+            //                variables, .json files and a List of KeyValue pairs from memory. The configuration will be
+            //                added in order which means that any duplicate settings in the environment variables
+            //                will override any already added settings. This allows options like the environment to be used
+            //                to alter configuration based on environment.
             var builder = new ConfigurationBuilder()
+
+                // Configuration: add some configuration from an in memory collection
+                .AddInMemoryCollection(new List<KeyValuePair<string, string>>
+                {
+                    new KeyValuePair<string, string>("Setting1", "Setting1Value"),
+                    new KeyValuePair<string, string>("Setting2", "Setting2Value")
+                })
+
+                // Configuration: add configuration from some optional .json files
                 .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
+
+                // Configuration: add some configuration from environment variables
                 .AddEnvironmentVariables();
 
             Configuration = builder.Build();

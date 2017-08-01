@@ -7,6 +7,10 @@
 </head>
 <body>
     <div>
+        @Html.ActionLink("Home", "Index", "Home")&nbsp; &nbsp;
+        @Html.ActionLink("Customers", "CustomersList", "Home")&nbsp; &nbsp;
+    </div>
+    <div>
         <p>Something from layout page!</p>
         @RenderBody()
     </div>
