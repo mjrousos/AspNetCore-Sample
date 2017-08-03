@@ -4,7 +4,9 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup>
-    <DebugType>full</DebugType>
+    <!-- VS2017 Test Explorer test navigation and callstack links don't work with DebugType full yet. See
+         issue https://github.com/Microsoft/vstest/issues/523#issuecomment-281061958
+    -->
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)\CodeStyles.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
