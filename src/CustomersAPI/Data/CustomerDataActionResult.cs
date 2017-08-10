@@ -2,7 +2,7 @@
 
 using CustomersShared.Data.DataEntities;
 
-namespace CustomerAPI.Data
+namespace CustomersAPI.Data
 {
     public class CustomerDataActionResult
     {

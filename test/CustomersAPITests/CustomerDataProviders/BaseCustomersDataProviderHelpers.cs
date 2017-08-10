@@ -1,6 +1,6 @@
 ﻿// Licensed under the MIT license. See LICENSE file in the samples root for full license information.
 
-using CustomerAPI.Data;
+using CustomersAPI.Data;
 using CustomersShared.Data.DataEntities;
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Reflection;
 using Xunit;
 
-namespace CustomerAPI.CustomerDataProviders.Tests
+namespace CustomersAPI.CustomerDataProviders.Tests
 {
     public abstract class BaseCustomersDataProviderHelpers
     {

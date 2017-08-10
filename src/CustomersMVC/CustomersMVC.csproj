@@ -27,6 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CustomersDataModels\CustomersDataModels.csproj" />
     <ProjectReference Include="..\RequestCorrelation\RequestCorrelation.csproj" />
   </ItemGroup>
 </Project>

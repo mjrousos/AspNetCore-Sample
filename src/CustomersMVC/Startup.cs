@@ -3,10 +3,13 @@
 using CustomersMVC.CustomersAPI;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Globalization;
 using System.Net.Http;
 
 namespace CustomersMVC
@@ -28,8 +31,14 @@ namespace CustomersMVC
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // Add framework services.
-            services.AddMvc();
+            // Localization: This adds the localization service. This service is also required for the ViewLocalization
+            //               and DataAnnotationsLocalization. The ResourcePath sets the base location of the resources to
+            //               a folder called resources.
+            services.AddLocalization(options => options.ResourcesPath = "Resources");
+
+            services.AddMvc()
+              .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
+              .AddDataAnnotationsLocalization();
 
             // Add the CustomersApiService into the dependency container
             services.AddSingleton<CustomersAPIService>(CreateCustomersAPIService());
@@ -60,6 +69,30 @@ namespace CustomersMVC
 
             // Middleware: Here, we add our custom middleware type to the HTTP processing pipeline
             app.UseRequestCorrelation();
+
+            // Localization: Here we are building a list of supported cultures which will be used in
+            //               the RequestLocalizationOptions in the app.UseRequestLocalization call below.
+            var supportedCultures = new[]
+              {
+                    new CultureInfo("en-US"),
+                    new CultureInfo("es-MX"),
+                    new CultureInfo("fr-FR"),
+              };
+
+            // Localization: Here we are configuring the RequstLocalization including setting the supported cultures from above
+            //               in the RequestLocalizationOptions. We are also setting the default request culture to be used
+            //               for current culture. These options will be used wherever we request localized strings.
+            //               For more information see https://docs.asp.net/en/latest/fundamentals/localization.html
+            app.UseRequestLocalization(new RequestLocalizationOptions
+            {
+                DefaultRequestCulture = new RequestCulture("en-US"),
+
+                // Formatting numbers, dates, etc.
+                SupportedCultures = supportedCultures,
+
+                // UI strings that we have localized.
+                SupportedUICultures = supportedCultures
+            });
 
             app.UseStaticFiles();
 

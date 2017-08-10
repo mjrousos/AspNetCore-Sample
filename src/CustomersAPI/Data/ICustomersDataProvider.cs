@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace CustomerAPI.Data
+namespace CustomersAPI.Data
 {
     public interface ICustomersDataProvider : IDisposable
     {

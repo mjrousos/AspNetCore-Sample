@@ -1,37 +1,44 @@
 ﻿// Licensed under the MIT license. See LICENSE file in the samples root for full license information.
 
-using CustomerAPI.Data;
+using CustomersAPI.Data;
 using CustomersShared.Data.DataEntities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Resources;
 using System.Threading.Tasks;
 
-namespace CustomerAPI.Controllers
+namespace CustomersAPI.Controllers
 {
     [Route("api/[controller]")]
     public class CustomersController : Controller
     {
         private readonly ICustomersDataProvider _customersDataProvider;
         private readonly ResourceManager _resourceManager;
+        private readonly IStringLocalizer<CustomersController> _localizer;
         private readonly ILogger _logger;
 
         // Dependency Injection: ASP.NET Core will automatically populate controller constructor arguments by resolving
         // services from the DI container. If needed, those objects will be created by calling constructors
         // whose own arguments will be provided by DI, and so on recursively until the whole object graph
         // needed has been constructed.
+        //
         // Logging: Here a logger is dependency injected and then used to log to the loggers added to the LoggerFactory.
         //          The category of CustomersController has been added using the <T> of CustomersController. This information
         //          will be written out in the log information. The logging information is written throughout the methods below.
+        //
+        // Localization: Here we are injecting a ResourceManager that will be used by the api methods below for localizing content.
         public CustomersController(ICustomersDataProvider customersDataProvider,
                                    ResourceManager resourceManager,
+                                   IStringLocalizer<CustomersController> localizer,
                                    ILogger<CustomersController> logger)
         {
             _customersDataProvider = customersDataProvider;
             _resourceManager = resourceManager;
+            _localizer = localizer;
             _logger = logger;
         }
 
@@ -46,7 +53,7 @@ namespace CustomerAPI.Controllers
             // placeholders which are replaced by the passed in parameters. This is nice because it provides
             // the parameters to the logging provider which can write out the parameters in a structured making
             // querying the log output easier.
-            _logger.LogInformation("{methodName}: {message}", nameof(Get), _resourceManager.GetString("LoggingGetCustomers"));
+            _logger.LogInformation(BuildLogInfo(nameof(Get), "LoggingGetCustomers"));
             return _customersDataProvider.GetCustomers();
         }
 
@@ -80,22 +87,22 @@ namespace CustomerAPI.Controllers
         {
             if (customerDataTransferObject == null || !customerDataTransferObject.ValidateCustomerDataTransferObject())
             {
-                _logger.LogError(BuildLogInfo(nameof(PostAsync), "CustomerInfoInvalid", resourceManager));
-                return BadRequest(BuildStringFromResource("CustomerInfoInvalid", resourceManager));
+                _logger.LogError(BuildLogInfo(nameof(PostAsync), "CustomerInfoInvalid"));
+                return BadRequest(BuildStringFromResource("CustomerInfoInvalid"));
             }
 
             var customerName = $"{customerDataTransferObject.FirstName} {customerDataTransferObject.LastName}";
 
-            _logger.LogInformation(BuildLogInfo(nameof(PostAsync), "LoggingAddingCustomer", resourceManager, customerName));
+            _logger.LogInformation(BuildLogInfo(nameof(PostAsync), "LoggingAddingCustomer", customerName));
             var customerDataActionResult = await _customersDataProvider.TryAddCustomerAsync(customerDataTransferObject);
 
             if (!customerDataActionResult.IsSuccess)
             {
-                _logger.LogError(BuildLogInfo(nameof(PostAsync), "UnexpectedServerError", resourceManager));
-                return StatusCode(StatusCodes.Status500InternalServerError, BuildStringFromResource("UnexpectedServerError", resourceManager));
+                _logger.LogError(BuildLogInfo(nameof(PostAsync), "UnexpectedServerError"));
+                return StatusCode(StatusCodes.Status500InternalServerError, BuildStringFromResource("UnexpectedServerError"));
             }
 
-            _logger.LogInformation(BuildLogInfo(nameof(PostAsync), "LoggingAddedCustomer", resourceManager, customerName));
+            _logger.LogInformation(BuildLogInfo(nameof(PostAsync), "LoggingAddedCustomer", customerName));
             return Ok(customerDataActionResult.CustomerEntity);
         }
 
@@ -153,24 +160,16 @@ namespace CustomerAPI.Controllers
         }
 
         /// <summary>
-        /// Builds up a string looking up a resource and doing the replacements
+        /// Builds up a string looking up a resource and doing the replacements.
         /// </summary>
         /// <param name="resourceStringName">Name of resource to use</param>
         /// <param name="replacements">Strings to use for replacing in the resource string</param>
         private string BuildStringFromResource(string resourceStringName, params object[] replacements)
         {
-            return BuildStringFromResource(resourceStringName, _resourceManager, replacements);
-        }
-
-        /// <summary>
-        /// Builds up a string looking up a resource and doing the replacements
-        /// </summary>
-        /// <param name="resourceStringName">Name of resource to use</param>
-        /// <param name="resourceManager">ResourceManager instance to look up resources with</param>
-        /// <param name="replacements">Strings to use for replacing in the resource string</param>
-        private string BuildStringFromResource(string resourceStringName, ResourceManager resourceManager, params object[] replacements)
-        {
-            return string.Format(resourceManager.GetString(resourceStringName), replacements);
+            // Localization: Here we are using the more clasic way of getting resources using the ResourceManager
+            //               instead of the IStringLocalizer to look up resource strings from the .resx files. We
+            //               will get the appropriate resource based on the request culture.
+            return string.Format(_resourceManager.GetString(resourceStringName), replacements);
         }
 
         /// <summary>
@@ -181,19 +180,10 @@ namespace CustomerAPI.Controllers
         /// <param name="replacements">Strings to use for replacing in the resource string</param>
         private string BuildLogInfo(string methodName, string resourceStringName, params object[] replacements)
         {
-            return BuildLogInfo(methodName, resourceStringName, _resourceManager, replacements);
-        }
-
-        /// <summary>
-        /// Builds up a log string using the parameters passed in
-        /// </summary>
-        /// <param name="methodName">Name of method logging from</param>
-        /// <param name="resourceStringName">Name of resource to use</param>
-        /// <param name="resourceManager">ResourceManager instance to use for looking up resources</param>
-        /// <param name="replacements">Strings to use for replacing in the resource string</param>
-        private string BuildLogInfo(string methodName, string resourceStringName, ResourceManager resourceManager, params object[] replacements)
-        {
-            return $"{methodName}: {BuildStringFromResource(resourceStringName, resourceManager, replacements)}";
+            // Localization: Here we are using .NET Core's IStringLocalizer to get the localized strings from
+            //               the .resx files instead of the ResourceManager. We will get the appropriate resource
+            //               based on the request culture.
+            return $"{methodName}: {_localizer[resourceStringName, replacements]}";
         }
     }
 }

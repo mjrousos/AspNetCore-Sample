@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace CustomerAPI.CustomerDataProviders.Tests
+namespace CustomersAPI.CustomerDataProviders.Tests
 {
     public abstract class BaseCustomerDataProviderTests : BaseCustomersDataProviderHelpers
     {

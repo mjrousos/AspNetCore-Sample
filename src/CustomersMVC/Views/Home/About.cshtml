@@ -1,0 +1,13 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+
+@{
+    /* Localization: This view is using the IViewLocalizer which is based on the IHtmlLocalizer which will prevent
+                     Razor from HTML encoding the localized strings inside the html markup. By default the resources will be
+                     looked for in the directory the view is located in. */
+}
+
+@inject IViewLocalizer Localizer
+
+<h4>@Localizer["<div style='color:blue'>CustomerSample</div>"]</h4>
+
+<p>@Localizer["<div style='color:green'>CustomerSampleDescription</div>"]</p>

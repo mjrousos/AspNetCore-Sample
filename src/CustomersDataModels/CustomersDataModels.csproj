@@ -15,4 +15,16 @@
   <ItemGroup>
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.1.0" />
   </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\CustomersShared.Data.DataEntities.CustomerDataTransferObject.fr-fr.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\CustomersShared.Data.DataEntities.CustomerDataTransferObject.es-mx.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\CustomersShared.Data.DataEntities.CustomerDataTransferObject.en-us.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
 </Project>

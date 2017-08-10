@@ -1,6 +1,6 @@
 ﻿// Licensed under the MIT license. See LICENSE file in the samples root for full license information.
 
-using CustomersMVC.Customers;
+using CustomersShared.Data.DataEntities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -73,7 +73,7 @@ namespace CustomersMVC.CustomersAPI
         /// <summary>
         /// Returns a list of customers
         /// </summary>
-        public async Task<IActionResult> AddCustomerAsync(CustomerEntity customer)
+        public async Task<IActionResult> AddCustomerAsync(CustomerDataTransferObject customer)
         {
             var query = "/Api/Customers";
             var content = new StringContent(JsonConvert.SerializeObject(customer), Encoding.UTF8, "application/json");

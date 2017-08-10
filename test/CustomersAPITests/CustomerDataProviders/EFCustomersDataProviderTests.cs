@@ -1,10 +1,10 @@
 ﻿// Licensed under the MIT license. See LICENSE file in the samples root for full license information.
 
-using CustomerAPI.Data;
+using CustomersAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace CustomerAPI.CustomerDataProviders.Tests
+namespace CustomersAPI.CustomerDataProviders.Tests
 {
     public class EFCustomersDataProviderTests : BaseCustomerDataProviderTests
     {

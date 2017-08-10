@@ -14,12 +14,15 @@ namespace CustomersShared.Data.DataEntities
         [Column("CustomerId")]
         public virtual Guid Id { get; set; }
 
-        [Required]
+        // Localization: Here we are using data annotations for the error messages. The localized resources are automatically
+        //               looked up in the resources folder. The filename should be the namespace along with class.
+        [Required(ErrorMessage = "FirstNameRequiredError")]
         public virtual string FirstName { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "LastNameRequiredError")]
         public virtual string LastName { get; set; }
 
+        [Phone(ErrorMessage = "PhoneNumberInvalidError")]
         public virtual string PhoneNumber { get; set; }
 
         public virtual string Address { get; set; }

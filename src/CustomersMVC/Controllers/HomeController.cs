@@ -1,8 +1,8 @@
 ﻿// Licensed under the MIT license. See LICENSE file in the samples root for full license information.
 
-using CustomersMVC.Customers;
 using CustomersMVC.CustomersAPI;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using RequestCorrelation;
 using System;
@@ -15,16 +15,23 @@ namespace CustomersMVC.Controllers
     {
         private readonly CustomersAPIService _customersService;
         private readonly IOptions<HomeControllerOptions> _homeControllerOptions;
+        private readonly IStringLocalizer<HomeController> _localizer;
 
         // Configuration: Here the HomeControllerOptions are dependency injected into the home controller. These options
         //                are then passed into the Index view to be used there as well.
-        public HomeController(CustomersAPIService customersService, IOptions<HomeControllerOptions> homeControllerOptions)
+        //
+        // Localization: Here we are dependency injecting the IStringLocalizer for the HomeController. This will be used for
+        //               localizing resources in the HomeController.
+        public HomeController(CustomersAPIService customersService,
+                              IOptions<HomeControllerOptions> homeControllerOptions,
+                              IStringLocalizer<HomeController> localizer)
         {
             _customersService = customersService;
             _homeControllerOptions = homeControllerOptions;
+            _localizer = localizer;
         }
 
-        [Route("")]
+        [HttpGet("")]
         public IActionResult Index()
         {
             // Configuration: Here we are passing the IOptions<HomeControllerOptions> into the view to be used for the model in the view.
@@ -33,7 +40,24 @@ namespace CustomersMVC.Controllers
             return View("Index", _homeControllerOptions);
         }
 
-        [Route("[Controller]/[Action]")]
+        // Localization: This method adds the localized ping message from the localizer into the ViewBag. In
+        //               this case we are demonstrating that there is no .resx file for the resources, but the
+        //               localizer still returns a message. Once a .resx file exists it will replace the
+        //               text with the text from the "PingMessage" inside the .resx for the request culture.
+        [HttpGet("[Controller]/[Action]")]
+        public IActionResult Ping()
+        {
+            ViewBag.PingMessage = _localizer["PingMessage"];
+            return View();
+        }
+
+        [HttpGet("[Controller]/[Action]")]
+        public IActionResult About()
+        {
+            return View();
+        }
+
+        [HttpGet("[Controller]/[Action]")]
         public async Task<IActionResult> CustomersList()
         {
             SetCorrelationId();
@@ -43,25 +67,15 @@ namespace CustomersMVC.Controllers
             return View(customersList);
         }
 
-        [Route("[Controller]/[Action]")]
-        public async Task<IActionResult> AddCustomer()
+        [HttpGet("[Controller]/[Action]")]
+        public IActionResult AddCustomer()
         {
             SetCorrelationId();
 
-            var customer = new CustomerEntity
-            {
-                Id = Guid.NewGuid(),
-                FirstName = "Jon",
-                LastName = "Smith",
-                PhoneNumber = "555-555-5555"
-            };
-
-            await _customersService.AddCustomerAsync(customer);
-
-            return RedirectToAction("CustomersList");
+            return View();
         }
 
-        [Route("[Controller]/[Action]/{customerId}")]
+        [HttpDelete("[Controller]/[Action]/{customerId}")]
         public async Task<IActionResult> DeleteCustomer(Guid customerId)
         {
             SetCorrelationId();

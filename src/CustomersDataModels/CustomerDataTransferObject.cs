@@ -6,12 +6,15 @@ namespace CustomersShared.Data.DataEntities
 {
     public class CustomerDataTransferObject
     {
-        [Required]
+        // Localization: Here we are using data annotations for the error messages. The localized resources are automatically
+        //               looked up in the resources folder. The filename should be the namespace along with class.
+        [Required(ErrorMessage = "FirstNameRequiredError")]
         public string FirstName { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "LastNameRequiredError")]
         public string LastName { get; set; }
 
+        [Phone(ErrorMessage = "PhoneNumberInvalidError")]
         public string PhoneNumber { get; set; }
 
         public string Address { get; set; }

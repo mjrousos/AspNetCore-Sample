@@ -1,12 +1,13 @@
 ﻿// Licensed under the MIT license. See LICENSE file in the samples root for full license information.
 
-using CustomerAPI.CustomerDataProviders.Tests;
-using CustomerAPI.Data;
+using CustomersAPI.CustomerDataProviders.Tests;
+using CustomersAPI.Data;
 using CustomersDemo.Tests.Helpers;
 using CustomersShared.Data.DataEntities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
@@ -15,7 +16,7 @@ using System.Resources;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace CustomerAPI.Controllers.Tests
+namespace CustomersAPI.Controllers.Tests
 {
     public class CustomersControllerTests : BaseCustomersDataProviderHelpers
     {
@@ -37,12 +38,18 @@ namespace CustomerAPI.Controllers.Tests
             // Setup mock services
             var services = new ServiceCollection();
 
+            // Add EF service
             var efServiceProvider = new ServiceCollection().AddEntityFrameworkInMemoryDatabase().BuildServiceProvider();
             services.AddDbContext<EFCustomersDataProvider>(options =>
                 options.UseInMemoryDatabase().UseInternalServiceProvider(efServiceProvider));
             services.AddScoped<ICustomersDataProvider, EFCustomersDataProvider>();
-            services.AddSingleton(new ResourceManager("CustomersAPI.Resources.StringResources",
-                                          typeof(Startup).GetTypeInfo().Assembly));
+
+            // Add resources services
+            var resourceManager = new ResourceManager("CustomersAPI.Resources.Controllers.CustomersController",
+                      typeof(Startup).GetTypeInfo().Assembly);
+            services.AddSingleton(resourceManager);
+            services.AddSingleton(typeof(IStringLocalizer<CustomersController>),
+                                  new StringLocalizer<CustomersController>(new TestStringLocalizerFactory(resourceManager)));
 
             _serviceProvider = services.BuildServiceProvider();
         }
@@ -354,7 +361,10 @@ namespace CustomerAPI.Controllers.Tests
         /// </summary>
         private CustomersController CreateTestCustomersController(ICustomersDataProvider customersDataProvider, TestLogger<CustomersController> testLogger)
         {
-            var controller = new CustomersController(customersDataProvider, _serviceProvider.GetRequiredService<ResourceManager>(), testLogger);
+            var controller = new CustomersController(customersDataProvider,
+                                                     _serviceProvider.GetRequiredService<ResourceManager>(),
+                                                     _serviceProvider.GetRequiredService<IStringLocalizer<CustomersController>>(),
+                                                     testLogger);
 
             // Set mock HTTP context (including DI service provider)
             controller.ControllerContext.HttpContext = new DefaultHttpContext()
@@ -395,9 +405,40 @@ namespace CustomerAPI.Controllers.Tests
             Assert.Equal(testLogger.BuildLogString(expectedLogLevel, expectedMessage), testLogger.LoggedMessages[logMessageIndexToVerify]);
         }
 
-        public TestLogger<CustomersController> CreateTestLogger()
+        /// <summary>
+        /// Returns a TestLogger to be used by the tests
+        /// </summary>
+        private TestLogger<CustomersController> CreateTestLogger()
         {
             return new TestLogger<CustomersController>();
+        }
+
+        /// <summary>
+        /// Returns an IStringLocalizerFactory to be used in adding the mocked IStringLocalizer service
+        /// </summary>
+        private class TestStringLocalizerFactory : IStringLocalizerFactory
+        {
+            private readonly ResourceManager _resourceManager;
+            private readonly string _resourcePath;
+
+            public TestStringLocalizerFactory(ResourceManager resManager, string resourcePath = "Resources")
+            {
+                _resourceManager = resManager;
+                _resourcePath = resourcePath;
+            }
+
+            public IStringLocalizer Create(Type resourceSource)
+            {
+                return new ResourceManagerStringLocalizer(_resourceManager,
+                                                          resourceSource.GetTypeInfo().Assembly,
+                                                          _resourcePath,
+                                                          new ResourceNamesCache());
+            }
+
+            public IStringLocalizer Create(string baseName, string location)
+            {
+                throw new NotImplementedException("Not used");
+            }
         }
     }
 }

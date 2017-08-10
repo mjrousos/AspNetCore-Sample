@@ -8,7 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace CustomerAPI.Data
+namespace CustomersAPI.Data
 {
     public class EFCustomersDataProvider : DbContext, ICustomersDataProvider
     {

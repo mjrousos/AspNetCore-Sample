@@ -215,6 +215,7 @@
             <tab5>&lt;ul class="nav navbar-nav"&gt;</tab5><br />
             <tab6>&lt;li&gt;@Html.ActionLink("Home", "Index", "Home", new { }, new { @class = "navbar-brand" })&lt;/li&gt;</tab6><br />
             <tab6>&lt;li&gt;@Html.ActionLink("Customers", "CustomersList", "Home", new { }, new { @class = "navbar-brand" })&lt;/li&gt;</tab6><br />
+            <tab6>&lt;li&gt;@Html.ActionLink("About", "Index", "About", new { }, new { @class = "navbar-brand" })&lt;/li&gt;</tab6><br />
             <tab5>&lt;/ul&gt;</tab5><br />
             <tab4>&lt;/div&gt;</tab4><br />
             <tab3>&lt;/div&gt;</tab3><br />
@@ -288,14 +289,17 @@
         <h4>Add ability to add customers</h4>
         <ul><li>Replace existing AddCustomer method in the HomeController with the following two methods</li></ul>
         <div id="codeblock">
+            [HttpGet("[Controller]/[Action]")]<br />
             public IActionResult AddCustomer()<br />
             {<br />
             <tab1>return View();</tab1><br />
             }<br />
             <br />
-            [HttpPost]<br />
-            public async Task&lt;IActionResult&gt; AddCustomer(CustomerEntity customer)<br />
+            [HttpPost("[Controller]/[Action]")]<br />
+            public async Task&lt;IActionResult&gt; AddCustomer(CustomerDataTransferObject customer)<br />
             {<br />
+            <tab1>SetCorrelationId();</tab1>
+            <br />
             <tab1>if (ModelState.IsValid)</tab1><br />
             <tab1>{</tab1><br />
             <tab2>await _customersService.AddCustomerAsync(customer);</tab2><br />
@@ -310,9 +314,9 @@
     <ul><li>Add following import into _ViewImports</li></ul>
     <div id="codeblock">@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers</div>
 
-    <ul><li>Add a new View under the views\Home folder with the following content</li></ul>
+    <ul><li>Update the AddCustomer view with the following content</li></ul>
     <div id="codeblock">
-        @model CustomerEntity<br />
+        @model CustomerDataTransferObject<br />
         <br />
         @{<br />
         <tab1>ViewBag.Title = "Add Customer";</tab1><br />

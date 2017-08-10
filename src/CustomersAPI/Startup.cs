@@ -2,7 +2,7 @@
 
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
-using CustomerAPI.Data;
+using CustomersAPI.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -20,7 +20,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Threading.Tasks;
 
-namespace CustomerAPI
+namespace CustomersAPI
 {
     public class Startup
     {
@@ -63,6 +63,9 @@ namespace CustomerAPI
         // the non-default container used.
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
+            // Localization: Here we are adding in the localizaton service which will enable using IStringLocalizer in the CustomersController
+            services.AddLocalization(options => options.ResourcesPath = "Resources");
+
             // Add framework services.
             services.AddMvc();
 
@@ -167,8 +170,8 @@ namespace CustomerAPI
                 timingLogger.LogInformation($"Request to {context.Request.Method}:{context.Request.Path} processed in {timer.ElapsedMilliseconds} ms");
             });
 
-            /* Add Global/Localization support for more information see
-               https://docs.asp.net/en/latest/fundamentals/localization.html */
+            // Localization: Here we are building a list of supported cultures which will be used in the
+            //               RequestLocalizationOptions in the app.UseRequestLocalization call below.
             var supportedCultures = new[]
               {
                     new CultureInfo("en-US"),
@@ -176,6 +179,10 @@ namespace CustomerAPI
                     new CultureInfo("fr-FR"),
               };
 
+            // Localization: Here we are configuring the RequstLocalization including setting the supported cultures from above
+            //               in the RequestLocalizationOptions. We are also setting the default request culture to be used
+            //               for current culture. These options will be used wherever we request localized strings.
+            //               For more information see https://docs.asp.net/en/latest/fundamentals/localization.html
             app.UseRequestLocalization(new RequestLocalizationOptions
             {
                 DefaultRequestCulture = new RequestCulture("en-US"),

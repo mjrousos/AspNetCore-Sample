@@ -1,5 +1,6 @@
 ﻿// Licensed under the MIT license. See LICENSE file in the samples root for full license information.
 
+using CustomersAPI.Controllers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,7 +8,7 @@ using System.IO;
 using System.Reflection;
 using System.Resources;
 
-namespace CustomerAPI
+namespace CustomersAPI
 {
     public class Program
     {
@@ -22,10 +23,14 @@ namespace CustomerAPI
                 // Dependency Injection: This is an easy way of injecting services that wouldn't otherwise be available in
                 // the web application's Startup class (for example, web apps running in a Service Fabric
                 // application could have their service context injected here).
+                //
+                // Localization: Here we are adding a singleton instance of the ResourceManager into the ServicesCollection for the
+                //               CustomersController. The naming convention for the resource files for the CustomersController follows
+                //               the path pattern by locating the resources in Resources/Controllers/CustomersController.<language>.resx.
                 .ConfigureServices(serviceCollection =>
                 {
-                    serviceCollection.AddSingleton(new ResourceManager("CustomersAPI.Resources.StringResources",
-                                                      typeof(Startup).GetTypeInfo().Assembly));
+                    serviceCollection.AddSingleton(new ResourceManager("CustomersAPI.Resources.Controllers.CustomersController",
+                                                   typeof(Startup).GetTypeInfo().Assembly));
                 })
                 .UseUrls("http://+:5000")
                 .UseContentRoot(Directory.GetCurrentDirectory())
