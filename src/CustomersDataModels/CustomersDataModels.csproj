@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard1.3</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <Notes>NetStandard1.3 is used for the best practice of using the lowest netstandard version that can be applied</Notes>
     <AssemblyName>CustomersDataModels</AssemblyName>
     <PackageId>CustomersDataModels</PackageId>
