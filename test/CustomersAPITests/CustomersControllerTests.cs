@@ -41,7 +41,7 @@ namespace CustomersAPI.Controllers.Tests
             // Add EF service
             var efServiceProvider = new ServiceCollection().AddEntityFrameworkInMemoryDatabase().BuildServiceProvider();
             services.AddDbContext<EFCustomersDataProvider>(options =>
-                options.UseInMemoryDatabase().UseInternalServiceProvider(efServiceProvider));
+                options.UseInMemoryDatabase("CustomersDB").UseInternalServiceProvider(efServiceProvider));
             services.AddScoped<ICustomersDataProvider, EFCustomersDataProvider>();
 
             // Add resources services
@@ -49,7 +49,7 @@ namespace CustomersAPI.Controllers.Tests
                       typeof(Startup).GetTypeInfo().Assembly);
             services.AddSingleton(resourceManager);
             services.AddSingleton(typeof(IStringLocalizer<CustomersController>),
-                                  new StringLocalizer<CustomersController>(new TestStringLocalizerFactory(resourceManager)));
+                                  new StringLocalizer<CustomersController>(new TestStringLocalizerFactory(resourceManager, CreateTestLogger())));
 
             _serviceProvider = services.BuildServiceProvider();
         }
@@ -420,11 +420,13 @@ namespace CustomersAPI.Controllers.Tests
         {
             private readonly ResourceManager _resourceManager;
             private readonly string _resourcePath;
+            private readonly ILogger _testLogger;
 
-            public TestStringLocalizerFactory(ResourceManager resManager, string resourcePath = "Resources")
+            public TestStringLocalizerFactory(ResourceManager resManager, ILogger testLogger, string resourcePath = "Resources")
             {
                 _resourceManager = resManager;
                 _resourcePath = resourcePath;
+                _testLogger = testLogger;
             }
 
             public IStringLocalizer Create(Type resourceSource)
@@ -432,7 +434,8 @@ namespace CustomersAPI.Controllers.Tests
                 return new ResourceManagerStringLocalizer(_resourceManager,
                                                           resourceSource.GetTypeInfo().Assembly,
                                                           _resourcePath,
-                                                          new ResourceNamesCache());
+                                                          new ResourceNamesCache(),
+                                                          _testLogger);
             }
 
             public IStringLocalizer Create(string baseName, string location)

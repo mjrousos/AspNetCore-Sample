@@ -19,7 +19,7 @@ namespace CustomersAPI.CustomerDataProviders.Tests
             // Create a new options instance telling the context to use an
             // InMemory database and the new service provider.
             var builder = new DbContextOptionsBuilder<EFCustomersDataProvider>();
-            builder.UseInMemoryDatabase()
+            builder.UseInMemoryDatabase("CustomersDB")
                        .UseInternalServiceProvider(serviceProvider);
 
             return new EFCustomersDataProvider(builder.Options);
