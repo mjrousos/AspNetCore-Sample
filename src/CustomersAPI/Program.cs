@@ -32,7 +32,6 @@ namespace CustomersAPI
                     serviceCollection.AddSingleton(new ResourceManager("CustomersAPI.Resources.Controllers.CustomersController",
                                                    typeof(Startup).GetTypeInfo().Assembly));
                 })
-                .UseUrls("http://+:5000")
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseIISIntegration()
                 .UseStartup<Startup>()

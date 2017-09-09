@@ -5,7 +5,7 @@
 # image, but the microsoft/aspnetcore images offer some perf benefits.
 # https://hub.docker.com/r/microsoft/aspnetcore/
 # https://hub.docker.com/r/microsoft/dotnet/
-FROM microsoft/aspnetcore:1.0
+FROM microsoft/aspnetcore:2.0.0-preview2-stretch
 
 # The optional source arg is just to allow
 # overriding the location that published output
@@ -13,9 +13,6 @@ FROM microsoft/aspnetcore:1.0
 ARG source
 
 WORKDIR /app
-
-# Expose ports that Kestrel will listen on
-EXPOSE 5000
 
 # Notice that, by default, this copies
 # from a folder that's populated by docker-compose.ci.build.
