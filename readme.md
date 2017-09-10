@@ -36,3 +36,4 @@ In order to enforce these styles, each project imports the global `dir.props` an
   <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), dir.targets))\dir.targets" />
 </Project>
 ```
+
