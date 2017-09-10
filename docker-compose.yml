@@ -11,9 +11,19 @@ services:
     build:
       context: ./src/CustomersAPI
       dockerfile: Dockerfile
+    ports:
+      # Normally, this internal API wouldn't need its port exposed, but I do so here
+      # so that I can demo hitting it in a container
+      - "8080:80"
 
   customersmvc:
     image: customersmvc
     build:
       context: ./src/CustomersMVC
       dockerfile: Dockerfile
+    depends_on:
+      - customersapi
+    environment:
+      - CustomersAPIService:Url=http://customersapi
+    ports:
+      - "80:80"
