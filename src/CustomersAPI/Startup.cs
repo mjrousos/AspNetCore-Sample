@@ -174,9 +174,9 @@ namespace CustomersAPI
             //               RequestLocalizationOptions in the app.UseRequestLocalization call below.
             var supportedCultures = new[]
               {
-                    new CultureInfo("en-US"),
-                    new CultureInfo("es-MX"),
-                    new CultureInfo("fr-FR"),
+                    new CultureInfo("en-us"),
+                    new CultureInfo("es-mx"),
+                    new CultureInfo("fr-fr"),
               };
 
             // Localization: Here we are configuring the RequstLocalization including setting the supported cultures from above
@@ -185,7 +185,7 @@ namespace CustomersAPI
             //               For more information see https://docs.asp.net/en/latest/fundamentals/localization.html
             app.UseRequestLocalization(new RequestLocalizationOptions
             {
-                DefaultRequestCulture = new RequestCulture("en-US"),
+                DefaultRequestCulture = new RequestCulture("en-us"),
 
                 // Formatting numbers, dates, etc.
                 SupportedCultures = supportedCultures,
