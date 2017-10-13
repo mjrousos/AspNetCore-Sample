@@ -32,6 +32,7 @@ namespace CustomersAPI
                     serviceCollection.AddSingleton(new ResourceManager("CustomersAPI.Resources.Controllers.CustomersController",
                                                    typeof(Startup).GetTypeInfo().Assembly));
                 })
+                .UseUrls("http://+:5000") // Informs Kestrel which ports to listen on; use Kestrel options/listeners for more control
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseIISIntegration()
                 .UseStartup<Startup>()

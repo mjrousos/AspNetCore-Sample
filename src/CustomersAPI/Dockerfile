@@ -14,6 +14,9 @@ ARG source
 
 WORKDIR /app
 
+# Expose ports that Kestrel will listen on
+EXPOSE 5000
+
 # Notice that, by default, this copies
 # from a folder that's populated by docker-compose.ci.build.
 # Depending on how you're building, this path may need updated
