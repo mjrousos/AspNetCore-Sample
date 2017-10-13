@@ -12,10 +12,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using RequestCorrelation;
-using Serilog;
-using Swashbuckle.Swagger.Model;
+using Swashbuckle.AspNetCore.Swagger;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Threading.Tasks;
@@ -50,18 +48,11 @@ namespace CustomersAPI
             services.AddMvc();
 
             // Add Swashbuckle service
-            services.AddSwaggerGen();
-            services.ConfigureSwaggerGen(options =>
+            services.AddSwaggerGen(c =>
             {
-                options.SingleApiVersion(new Info
-                {
-                    Version = "v1",
-                    Title = "Customer Demo API",
-                    Description = "Customer Demo API",
-                    TermsOfService = "None"
-                });
-
-                options.DescribeAllEnumsAsStrings();
+                // Swagger options go here
+                c.SwaggerDoc("v1", new Info { Title = "My API", Version = "v1" });
+                c.DescribeAllEnumsAsStrings();
             });
 
             // Add Entity Framework Customers data provider
@@ -157,7 +148,7 @@ namespace CustomersAPI
             app.UseMvc();
 
             app.UseSwagger();
-            app.UseSwaggerUi();
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1"));
         }
     }
 }
