@@ -12,6 +12,7 @@ namespace CustomersMVC
             var host = new WebHostBuilder()
                 .UseKestrel()
                 .UseContentRoot(Directory.GetCurrentDirectory())
+                .UseUrls("http://+:5001")
                 .UseIISIntegration()
                 .UseStartup<Startup>()
                 .Build();
