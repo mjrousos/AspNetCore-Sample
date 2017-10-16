@@ -12,10 +12,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using RequestCorrelation;
-using Serilog;
-using Swashbuckle.Swagger.Model;
+using Swashbuckle.AspNetCore.Swagger;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Threading.Tasks;
@@ -26,34 +24,14 @@ namespace CustomersAPI
     {
         private IContainer _autofacContainer;
 
-        public Startup(IHostingEnvironment env)
+        // Gets the application's IConfiguration object from the
+        // dependency injection container
+        public Startup(IConfiguration configuration)
         {
-            // Configuration: In this section we are adding configuration from different sources including environment
-            //                variables, .json files and a List of KeyValue pairs from memory. The configuration will be
-            //                added in order which means that any duplicate settings in the environment variables
-            //                will override any already added settings. This allows options like the environment to be used
-            //                to alter configuration based on environment.
-            var builder = new ConfigurationBuilder()
-
-                // Configuration: add some configuration from an in memory collection
-                .AddInMemoryCollection(new List<KeyValuePair<string, string>>
-                {
-                    new KeyValuePair<string, string>("Setting1", "Setting1Value"),
-                    new KeyValuePair<string, string>("Setting2", "Setting2Value")
-                })
-
-                // Configuration: add configuration from some optional .json files
-                .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
-
-                // Configuration: add some configuration from environment variables
-                .AddEnvironmentVariables();
-
-            Configuration = builder.Build();
+            Configuration = configuration;
         }
 
-        public IConfigurationRoot Configuration { get; }
+        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime.
         // Use this method to add services to the dependency injection container.
@@ -70,18 +48,11 @@ namespace CustomersAPI
             services.AddMvc();
 
             // Add Swashbuckle service
-            services.AddSwaggerGen();
-            services.ConfigureSwaggerGen(options =>
+            services.AddSwaggerGen(c =>
             {
-                options.SingleApiVersion(new Info
-                {
-                    Version = "v1",
-                    Title = "Customer Demo API",
-                    Description = "Customer Demo API",
-                    TermsOfService = "None"
-                });
-
-                options.DescribeAllEnumsAsStrings();
+                // Swagger options go here
+                c.SwaggerDoc("v1", new Info { Title = "My API", Version = "v1" });
+                c.DescribeAllEnumsAsStrings();
             });
 
             // Add Entity Framework Customers data provider
@@ -117,31 +88,6 @@ namespace CustomersAPI
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            // Logging: The ILoggerFactory is used to keep track of all the different loggers that have been added. When
-            //          using dependency injection to registered and can be accessed through dependency injection using the
-            //          ILogger interface. Here there are three loggers that are added to the loggerFactory instance.
-            loggerFactory.AddDebug();
-
-            // Logging: Some third-party logger's like Serilog also have logging support for ASPNet Core. The Serilog.Extensions.Logging,
-            //          Serilog.Settings.Configuration and Serilog.Sinks.Literate packages have been added to this project. These
-            //          packages allow the application to use Serilog, set the configuration and then display it using Literate in
-            //          the console output. The below code creates a logger using the Serilog configuration in the AppSettings.json
-            //          file and then adds the logger to the LoggerFactory.
-            if (!env.IsDevelopment())
-            {
-                // Logging: Console loggers are very useful for debugging, but not performant and should be omitted in
-                //          production. See https://blogs.msdn.microsoft.com/webdev/2017/04/26/asp-net-core-logging/ for
-                //          logging into Azure App Service
-            }
-            else
-            {
-                var serilogLogger = new LoggerConfiguration()
-                                    .ReadFrom.Configuration(Configuration)
-                                    .CreateLogger();
-
-                loggerFactory.AddSerilog(serilogLogger);
-            }
-
             // Logging: There is a logger created here that will log messages from the timing middleware to
             //          all the loggers contained in the LoggerFactory.
             // Middleware: Trivial middleware registration to demonstrate how
@@ -180,8 +126,8 @@ namespace CustomersAPI
                     //               be satisifed by either a supported specific culture
                     //               or a supported neutral culture, the specific culture
                     //               will be preferred.
-                    new CultureInfo("en-us"),
-                    new CultureInfo("fr-fr"),
+                    new CultureInfo("en-US"),
+                    new CultureInfo("fr-FR"),
                     new CultureInfo("es"),
               };
 
@@ -194,7 +140,7 @@ namespace CustomersAPI
             //               an ASP.NET Core culture cookie. Other options can be supported with custom RequestCultureProvider
             var requestLocalizationOptions = new RequestLocalizationOptions
             {
-                DefaultRequestCulture = new RequestCulture("en-us"),
+                DefaultRequestCulture = new RequestCulture("en-US"),
 
                 // Formatting numbers, dates, etc.
                 SupportedCultures = supportedCultures,
@@ -220,7 +166,7 @@ namespace CustomersAPI
             app.UseMvc();
 
             app.UseSwagger();
-            app.UseSwaggerUi();
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1"));
         }
     }
 }
