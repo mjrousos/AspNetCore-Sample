@@ -1,14 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
     <Notes>NetStandard1.3 is used for the best practice of using the lowest netstandard version that can be applied</Notes>
+    <TargetFramework>netstandard1.3</TargetFramework>
     <Title>Simple middleware library for setting the X-Correlation-Id header during a WebRequest</Title>
     <Version>1.0</Version>
     <Authors>Mike Rousos</Authors>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="1.1.2" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="1.1.2" />
   </ItemGroup>
 </Project>
