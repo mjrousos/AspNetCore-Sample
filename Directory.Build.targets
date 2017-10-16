@@ -6,7 +6,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Condition=" '$(DockerPublishing)' == '' " Include="StyleCop.Analyzers" Version="1.0.0" />
+    <PackageReference Condition=" '$(DockerPublishing)' == '' " Include="StyleCop.Analyzers" Version="1.0.2" />
   </ItemGroup>
 
 </Project>

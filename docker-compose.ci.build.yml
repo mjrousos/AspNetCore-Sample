@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 
 # This docker-compose file is not for running the app. Instead, it's for building the application
 # within a container. This has the benefit of building in a known environment so that:
@@ -8,7 +8,7 @@ version: '2'
 services:
   ci-build:
     # This base image includes .NET Core build tools
-    image: microsoft/aspnetcore-build:1.0-1.1
+    image: microsoft/aspnetcore-build:2.0.0
 
     # Volume mound the src folder so that the Docker container can reach out of its container to access
     # the solution source and output directory.
@@ -18,6 +18,5 @@ services:
     environment:
       - DockerPublishing=true
 
-
     # The build command. Can be updated, as necessary (though, be sure to update docker-compose accordingly if output dir changes)
-    command: /bin/bash -c "dotnet restore ./CustomersDemo-2017.sln && dotnet publish ./CustomersDemo-2017.sln -c Release -o ./obj/Docker/publish"
+    command: /bin/bash -c "dotnet restore ./CustomersDemo-2017.sln && dotnet publish ./src/CustomersAPI/CustomersAPI.csproj -c Release -o ./obj/Docker/publish && dotnet publish ./src/CustomersMVC/CustomersMVC.csproj -c Release -o ./obj/Docker/publish"

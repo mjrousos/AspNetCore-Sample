@@ -5,7 +5,7 @@
 # image, but the microsoft/aspnetcore images offer some perf benefits.
 # https://hub.docker.com/r/microsoft/aspnetcore/
 # https://hub.docker.com/r/microsoft/dotnet/
-FROM microsoft/aspnetcore:1.0
+FROM microsoft/aspnetcore:2.0.0
 
 # The optional source arg is just to allow
 # overriding the location that published output
