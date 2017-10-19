@@ -24,7 +24,7 @@ namespace CustomersAPI
     {
         private IContainer _autofacContainer;
 
-        // Gets the application's IConfiguration object from the 
+        // Gets the application's IConfiguration object from the
         // dependency injection container
         public Startup(IConfiguration configuration)
         {
@@ -95,7 +95,7 @@ namespace CustomersAPI
             // Middleware: Note that middleware will execute in the pipeline in the order it is registered.
             //             Since this trivial middleware is meant to time how long the entire processing
             //             of request takes, it is included very early in the middleware pipeline.
-            var timingLogger = loggerFactory.CreateLogger("CustomerAPI.Startup.TimingMiddleware");
+            var timingLogger = loggerFactory.CreateLogger("CustomersAPI.Startup.TimingMiddleware");
 
             app.Use(async (HttpContext context, Func<Task> next) =>
             {
@@ -120,16 +120,25 @@ namespace CustomersAPI
             //               RequestLocalizationOptions in the app.UseRequestLocalization call below.
             var supportedCultures = new[]
               {
+                    // Localization: Notice that neutral cultures (like 'es') are
+                    //               listed after specific cultures. This best practice
+                    //               ensures that if a particular culture request could
+                    //               be satisifed by either a supported specific culture
+                    //               or a supported neutral culture, the specific culture
+                    //               will be preferred.
                     new CultureInfo("en-US"),
-                    new CultureInfo("es-MX"),
                     new CultureInfo("fr-FR"),
+                    new CultureInfo("es"),
               };
 
             // Localization: Here we are configuring the RequstLocalization including setting the supported cultures from above
             //               in the RequestLocalizationOptions. We are also setting the default request culture to be used
             //               for current culture. These options will be used wherever we request localized strings.
             //               For more information see https://docs.asp.net/en/latest/fundamentals/localization.html
-            app.UseRequestLocalization(new RequestLocalizationOptions
+            //
+            //               Request locale will be read from an Accept-Language header, a culture query string, or
+            //               an ASP.NET Core culture cookie. Other options can be supported with custom RequestCultureProvider
+            var requestLocalizationOptions = new RequestLocalizationOptions
             {
                 DefaultRequestCulture = new RequestCulture("en-US"),
 
@@ -138,7 +147,16 @@ namespace CustomersAPI
 
                 // UI strings that we have localized.
                 SupportedUICultures = supportedCultures
-            });
+            };
+
+            // Localization: If needed, it's straight-forward to add custom request culture providers which can
+            //               extract requested culture from an HTTP context using arbitrary business logic.
+            // requestLocalizationOptions.RequestCultureProviders.Insert(0, new CustomRequestCultureProvider(async httpContext =>
+            // {
+            //    return new ProviderCultureResult("en");
+            // }));
+
+            app.UseRequestLocalization(requestLocalizationOptions);
 
             app.UseStaticFiles();
 

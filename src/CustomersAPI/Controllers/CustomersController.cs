@@ -73,7 +73,17 @@ namespace CustomersAPI.Controllers
 
                 // Logging: Here is an example of logging an error
                 _logger.LogError(BuildLogInfo(nameof(Get), "CustomerNotFound", id));
-                return new NotFoundObjectResult(BuildStringFromResource("CustomerNotFound", id));
+
+                // Localization: Resource strings can be retrieved from an IStringLocalizer by indexing
+                //               into the localizer with the resource name. Notice that format parameters
+                //               can also be specified as additional arguments in the indexer. These
+                //               objects will be formatted into the string.
+                //
+                //               If the specified resource name is not found a LocalizedString with a
+                //               value equal to the given name will be returned. So, for example, in this
+                //               case, if no "CustomerNotFound" resource is found, a string with value
+                //               "CustomerNotFound" will be returned.
+                return new NotFoundObjectResult(_localizer["CustomerNotFound", id].Value);
             }
 
             return Ok(customerDataActionResult.CustomerEntity);
