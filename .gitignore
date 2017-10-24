@@ -214,3 +214,7 @@ FakesAssemblies/
 GeneratedArtifacts/
 _Pvt_Extensions/
 ModelManifest.xml
+
+# Minified assets
+*.min.css
+*.min.js
