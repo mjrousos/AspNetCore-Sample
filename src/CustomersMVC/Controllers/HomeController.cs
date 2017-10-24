@@ -87,20 +87,34 @@ namespace CustomersMVC.Controllers
             if (ModelState.IsValid)
             {
                 await _customersService.AddCustomerAsync(customer);
-                return RedirectToAction("CustomersList");
+                return RedirectToAction(nameof(CustomersList));
             }
 
             return View(customer);
         }
 
-        [HttpDelete]
+        [HttpGet]
+        public IActionResult Delete(Guid? id)
+        {
+            SetCorrelationId();
+
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            return View(new CustomerEntity { Id = id.Value });
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteCustomer(Guid id)
         {
             SetCorrelationId();
 
             await _customersService.DeleteCustomerAsync(id);
 
-            return RedirectToAction("CustomersList");
+            return RedirectToAction(nameof(CustomersList));
         }
 
         // If the request has a correlation ID, register it with the HTTP client (to be included in outgoing requests)

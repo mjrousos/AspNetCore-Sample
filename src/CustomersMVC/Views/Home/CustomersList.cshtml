@@ -33,7 +33,7 @@
                             <td>@customer.City</td>
                             <td>@customer.State</td>
                             <td>@customer.ZipCode</td>
-                            <td> @Html.ActionLink("Remove", "DeleteCustomer", "Home", new { customerId = customer.Id }, new { @class = "btn btn-link" }) </td>
+                            <td> @Html.ActionLink("Remove", "Delete", "Home", new { id = customer.Id }, new { @class = "btn btn-link" }) </td>
                         </tr>
                     }
                 </tbody>
