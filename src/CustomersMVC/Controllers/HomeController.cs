@@ -41,7 +41,7 @@ namespace CustomersMVC.Controllers
             return View("Index", _homeControllerOptions);
         }
 
-        // Localization: This method adds the localized ping message from the localizer into the ViewBag. In
+        // Localization: This method adds the localized ping message from the localizer into the ViewData. In
         //               this case we are demonstrating that there is no .resx file for the resources, but the
         //               localizer still returns a message. Once a .resx file exists it will replace the
         //               text with the text from the "PingMessage" inside the .resx for the request culture.
@@ -51,7 +51,7 @@ namespace CustomersMVC.Controllers
             // Localization: The localized string will have a value of "PingMessage" since
             //               the resource name is used as a default value if no resource with
             //               an appropriate name is found.
-            ViewBag.PingMessage = _localizer["PingMessage"].Value;
+            ViewData["PingMessage"] = _localizer["PingMessage"].Value;
             return View();
         }
 
