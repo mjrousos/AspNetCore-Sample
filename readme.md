@@ -1,12 +1,16 @@
 ASPNET Core Sample Of Customers
 ===
 
-This is an application using a customer data model written with ASPNET Core.
+This is an application using a customer data model written with ASP.NET Core.
 There are several projects including REST apis, data models, middleware and an
-MVC front end. Included is a CustomersHandsOnLab.html which walks through
-features of the application including some exercises for building out a fuller
-featured MVC front end. Most of the ASPNET Core features are showcased and well
-documented in the CustomersAPI project.
+MVC front end. Many ASP.NET Core features are showcased and documented in the
+CustomersAPI project. The CustomersMVC project shows a few additional
+MVC-specific features.
+
+For more information on ASP.NET Core, see the
+[official documentation](https://docs.microsoft.com/aspnet/core/), the
+[ASP.NET team blog](https://blogs.msdn.microsoft.com/webdev/), or the
+[GitHub repo](https://github.com/aspnet/Home)
 
 ### Code Style Requirements
 The code style requirements are enforced with
