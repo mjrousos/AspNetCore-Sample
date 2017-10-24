@@ -48,7 +48,10 @@ namespace CustomersMVC.Controllers
         [HttpGet("[Controller]/[Action]")]
         public IActionResult Ping()
         {
-            ViewBag.PingMessage = _localizer["PingMessage"];
+            // Localization: The localized string will have a value of "PingMessage" since
+            //               the resource name is used as a default value if no resource with
+            //               an appropriate name is found.
+            ViewBag.PingMessage = _localizer["PingMessage"].Value;
             return View();
         }
 
