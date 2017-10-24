@@ -1,6 +1,7 @@
 ﻿// Licensed under the MIT license. See LICENSE file in the samples root for full license information.
 
 using CustomersMVC.CustomersAPI;
+using CustomersShared.Data.DataEntities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
@@ -73,6 +74,20 @@ namespace CustomersMVC.Controllers
             SetCorrelationId();
 
             return View();
+        }
+
+        [HttpPost("[Controller]/[Action]")]
+        public async Task<IActionResult> AddCustomer(CustomerDataTransferObject customer)
+        {
+            SetCorrelationId();
+
+            if (ModelState.IsValid)
+            {
+                await _customersService.AddCustomerAsync(customer);
+                return RedirectToAction("CustomersList");
+            }
+
+            return View(customer);
         }
 
         [HttpDelete("[Controller]/[Action]/{customerId}")]

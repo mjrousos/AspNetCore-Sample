@@ -2,24 +2,42 @@
 
 @model IEnumerable<CustomerEntity>
 
-<table>
-    <thead>
-        <tr style="background-color:lightblue">
-            <td>ID</td>
-            <td>FirstName</td>
-            <td>LastName</td>
-            <td>Phone</td>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var customer in Model)
-            {
-            <tr>
-                <td>@customer.Id</td>
-                <td>@customer.FirstName</td>
-                <td>@customer.LastName</td>
-                <td>@customer.PhoneNumber</td>
-            </tr>
-        }
-    </tbody>
-</table>
+<div id="Customers">
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <h2 class="panel-title">@Html.ActionLink("Add Customer", "AddCustomer", "Home")</h2>
+        </div>
+        <div class="panel-body">
+            <table class="table table-striped" style="white-space:nowrap">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Phone Number</th>
+                        <th>Address</th>
+                        <th>City</th>
+                        <th>State</th>
+                        <th>Zip</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var customer in Model)
+                    {
+                        <tr>
+                            <td>@customer.Id</td>
+                            <td>@customer.FirstName</td>
+                            <td>@customer.LastName</td>
+                            <td>@customer.PhoneNumber</td>
+                            <td>@customer.Address</td>
+                            <td>@customer.City</td>
+                            <td>@customer.State</td>
+                            <td>@customer.ZipCode</td>
+                            <td> @Html.ActionLink("Remove", "DeleteCustomer", "Home", new { customerId = customer.Id }, new { @class = "btn btn-link" }) </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
