@@ -32,7 +32,7 @@ namespace CustomersMVC.Controllers
             _localizer = localizer;
         }
 
-        [HttpGet("")]
+        [HttpGet]
         public IActionResult Index()
         {
             // Configuration: Here we are passing the IOptions<HomeControllerOptions> into the view to be used for the model in the view.
@@ -45,7 +45,7 @@ namespace CustomersMVC.Controllers
         //               this case we are demonstrating that there is no .resx file for the resources, but the
         //               localizer still returns a message. Once a .resx file exists it will replace the
         //               text with the text from the "PingMessage" inside the .resx for the request culture.
-        [HttpGet("[Controller]/[Action]")]
+        [HttpGet]
         public IActionResult Ping()
         {
             // Localization: The localized string will have a value of "PingMessage" since
@@ -55,13 +55,13 @@ namespace CustomersMVC.Controllers
             return View();
         }
 
-        [HttpGet("[Controller]/[Action]")]
+        [HttpGet]
         public IActionResult About()
         {
             return View();
         }
 
-        [HttpGet("[Controller]/[Action]")]
+        [HttpGet]
         public async Task<IActionResult> CustomersList()
         {
             SetCorrelationId();
@@ -71,7 +71,7 @@ namespace CustomersMVC.Controllers
             return View(customersList);
         }
 
-        [HttpGet("[Controller]/[Action]")]
+        [HttpGet]
         public IActionResult AddCustomer()
         {
             SetCorrelationId();
@@ -79,7 +79,7 @@ namespace CustomersMVC.Controllers
             return View();
         }
 
-        [HttpPost("[Controller]/[Action]")]
+        [HttpPost]
         public async Task<IActionResult> AddCustomer(CustomerDataTransferObject customer)
         {
             SetCorrelationId();
@@ -93,12 +93,12 @@ namespace CustomersMVC.Controllers
             return View(customer);
         }
 
-        [HttpDelete("[Controller]/[Action]/{customerId}")]
-        public async Task<IActionResult> DeleteCustomer(Guid customerId)
+        [HttpDelete]
+        public async Task<IActionResult> DeleteCustomer(Guid id)
         {
             SetCorrelationId();
 
-            await _customersService.DeleteCustomerAsync(customerId);
+            await _customersService.DeleteCustomerAsync(id);
 
             return RedirectToAction("CustomersList");
         }

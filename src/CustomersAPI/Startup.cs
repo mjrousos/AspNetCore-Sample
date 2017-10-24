@@ -163,7 +163,13 @@ namespace CustomersAPI
             // Middleware: More complex middleware can be added with the app.UseMiddleware method
             app.UseMiddleware<RequestCorrelationMiddleware>();
 
-            app.UseMvc();
+            // Routing: Convention-based routes can be defined on an IRouteBuilder
+            app.UseMvc(routes =>
+            {
+                routes.MapRoute(
+                    name: "default",
+                    template: "{controller=Home}/{action=Index}/{id?}");
+            });
 
             app.UseSwagger();
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1"));
