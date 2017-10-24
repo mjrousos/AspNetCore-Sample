@@ -76,7 +76,7 @@ namespace CustomersMVC.Controllers
         {
             SetCorrelationId();
 
-            return View();
+            return View(new CustomerDataTransferObject());
         }
 
         [HttpPost]
