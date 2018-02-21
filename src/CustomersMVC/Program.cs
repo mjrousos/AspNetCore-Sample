@@ -16,6 +16,10 @@ namespace CustomersMVC
             // been created with CreateDefaultBuiler, as shown here.
             var host = WebHost
                 .CreateDefaultBuilder()
+
+                // Enables automatic per-request diagnostics in AppInsights
+                .UseApplicationInsights()
+
                 .UseUrls("http://+:5001")
                 .UseStartup<Startup>()
                 .Build();
