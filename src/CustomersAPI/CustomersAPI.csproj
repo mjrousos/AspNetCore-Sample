@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ApplicationInsightsInitializers\ApplicationInsightsInitializers.csproj" />
     <ProjectReference Include="..\CustomersDataModels\CustomersDataModels.csproj" />
     <ProjectReference Include="..\RequestCorrelation\RequestCorrelation.csproj" />
   </ItemGroup>

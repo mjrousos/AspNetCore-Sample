@@ -1,5 +1,6 @@
 ﻿// Licensed under the MIT license. See LICENSE file in the samples root for full license information.
 
+using ApplicationInsightsInitializers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -17,6 +18,8 @@ namespace CustomersAPI
     {
         public static void Main(string[] args)
         {
+            CloudRoleTelemetryInitializer.SetRoleName("CustomersAPI");
+
             var host = new WebHostBuilder()
 
                 // Enables automatic per-request diagnostics in AppInsights
