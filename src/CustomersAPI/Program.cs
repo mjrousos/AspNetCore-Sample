@@ -18,6 +18,7 @@ namespace CustomersAPI
     {
         public static void Main(string[] args)
         {
+            // Sets the service's name in AppInsights telemetry
             CloudRoleTelemetryInitializer.SetRoleName("CustomersAPI");
 
             var host = new WebHostBuilder()
@@ -122,6 +123,7 @@ namespace CustomersAPI
                                     // This will send serilog diagnostics to AppInsights as traces (correlated with whichever request
                                     // was being processed when the diagnostic was logged). This could also be done via a config file,
                                     // but is done here since it is easier to use an instrumentation key from configuration this way.
+                                    // The CustomersMVC project demonstrates how to send logs directly to AppInsights without using Serilog.
                                     .WriteTo.ApplicationInsightsTraces(config["ApplicationInsights:InstrumentationKey"])
                                     .CreateLogger();
 

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Globalization;
 using System.Net.Http;
@@ -46,8 +47,13 @@ namespace CustomersMVC
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+            // It shouldn't be necessary to add logging providers in startup.cs anymore (they belong in program.cs)
+            // but this one is required due to a bug in Application Insights
+            // https://github.com/Microsoft/ApplicationInsights-aspnetcore/issues/536
+            loggerFactory.AddApplicationInsights(app.ApplicationServices, LogLevel.Information);
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
