@@ -9,14 +9,17 @@ services:
     # can use to refer to this one from within the Docker-compose cluster
     image: customersapi
     build:
-      context: ./src/CustomersAPI
-      dockerfile: Dockerfile
+      # Context is the current directory since individual services' Dockerfiles
+      # expect to be built from that shared context so that they can find dependencies
+      # during their build/publish stages.
+      context: .
+      dockerfile: /src/CustomersAPI/Dockerfile
 
   customersmvc:
     image: customersmvc
     build:
-      context: ./src/CustomersMVC
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: /src/CustomersMVC/Dockerfile
     depends_on:
       - customersapi
     environment:
