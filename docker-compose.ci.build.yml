@@ -10,7 +10,7 @@ services:
     # This base image includes .NET Core build tools
     image: microsoft/aspnetcore-build:2.0.0
 
-    # Volume mound the src folder so that the Docker container can reach out of its container to access
+    # Volume mount the src folder so that the Docker container can reach out of its container to access
     # the solution source and output directory.
     volumes:
       - .:/src
