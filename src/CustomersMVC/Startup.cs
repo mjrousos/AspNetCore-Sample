@@ -35,15 +35,24 @@ namespace CustomersMVC
               .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
               .AddDataAnnotationsLocalization();
 
-            // Add the CustomersApiService into the dependency container
-            services.AddSingleton<CustomersAPIService>(CreateCustomersAPIService());
-
             // Configuration: Here we add the HomeControllerOptions and set it to the Configurations HomeControllerOptions section
             //                which in this case came from the appsettings.json files. This is a convenient way to pass configuration
             //                options around using dependency injection. It also helps scope just the options that apply to logical
             //                parts of the application to those parts of the application versus passing all configuration to all logical
             //                parts of the application.
             services.Configure<HomeControllerOptions>(Configuration.GetSection("HomeControllerOptions"));
+
+            // Register a ResiliencePoliciesFactory and then use it to create
+            // and register the Policy[] to be used
+            services.AddTransient<ResiliencePoliciesFactory>();
+            services.AddSingleton(sp =>
+                sp.GetRequiredService<ResiliencePoliciesFactory>().CreatePolicies());
+
+            // Add the HttpClient used to access other services
+            services.AddSingleton(CreateHttpClient());
+
+            // Add the CustomersApiService into the dependency container
+            services.AddSingleton<CustomersAPIService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -99,14 +108,6 @@ namespace CustomersMVC
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
-        }
-
-        /// <summary>
-        /// Creates a CustomerApiService instance
-        /// </summary>
-        private CustomersAPIService CreateCustomersAPIService()
-        {
-            return new CustomersAPIService(CreateHttpClient());
         }
 
         /// <summary>

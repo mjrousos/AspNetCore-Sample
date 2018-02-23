@@ -4,6 +4,8 @@ using CustomersShared.Data.DataEntities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Polly;
+using Polly.Wrap;
 using RequestCorrelation;
 using System;
 using System.Collections.Generic;
@@ -17,10 +19,12 @@ namespace CustomersMVC.CustomersAPI
     public class CustomersAPIService
     {
         private readonly HttpClient _client;
+        private readonly PolicyWrap _policy;
 
-        public CustomersAPIService(HttpClient client)
+        public CustomersAPIService(HttpClient client, Policy[] resiliencePolicies)
         {
             _client = client;
+            _policy = Policy.WrapAsync(resiliencePolicies);
         }
 
         // This application uses the X-Correlation-Id header to associated separate
@@ -45,7 +49,7 @@ namespace CustomersMVC.CustomersAPI
         /// <typeparam name="T">Type of object to deserialize</typeparam>
         private async Task<T> GetJsonDataAsync<T>(string query)
         {
-            using (var response = await _client.GetAsync(query))
+            using (var response = await ExecuteWithResiliencePolicies(() => _client.GetAsync(query)))
             {
                 if (!response.IsSuccessStatusCode)
                 {
@@ -80,7 +84,7 @@ namespace CustomersMVC.CustomersAPI
 
             try
             {
-                var result = await _client.PostAsync(query, content);
+                var result = await ExecuteWithResiliencePolicies(() => _client.PostAsync(query, content));
                 return new StatusCodeResult((int)result.StatusCode);
             }
             catch (HttpRequestException)
@@ -98,14 +102,29 @@ namespace CustomersMVC.CustomersAPI
 
             try
             {
-                var result = await _client.DeleteAsync(query);
-
+                var result = await ExecuteWithResiliencePolicies(() => _client.DeleteAsync(query));
                 return new StatusCodeResult((int)result.StatusCode);
             }
             catch (HttpRequestException)
             {
                 return new StatusCodeResult(StatusCodes.Status503ServiceUnavailable);
             }
+        }
+
+        private async Task<HttpResponseMessage> ExecuteWithResiliencePolicies(Func<Task<HttpResponseMessage>> action)
+        {
+            var result = await _policy.ExecuteAsync(async () =>
+            {
+                var response = await action();
+                if (response.ReportsServerError())
+                {
+                    // Throwing in the case of server-side errors allows
+                    // the circuit breaker to correclty open, if necessary
+                    throw new HttpRequestException($"{response.StatusCode} : {response.ReasonPhrase}");
+                }
+                return response;
+            });
+            return result;
         }
     }
 }
