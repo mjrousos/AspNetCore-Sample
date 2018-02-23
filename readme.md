@@ -7,12 +7,37 @@ MVC front end. Many ASP.NET Core features are showcased and documented in the
 CustomersAPI project. The CustomersMVC project shows a few additional
 MVC-specific features.
 
-For more information on ASP.NET Core, see the
-[official documentation](https://docs.microsoft.com/aspnet/core/), the
-[ASP.NET team blog](https://blogs.msdn.microsoft.com/webdev/), or the
-[GitHub repo](https://github.com/aspnet/Home)
+Most code which relates to a particular feature area (configuration,
+dependency injection, localization, logging, middleware, routing) has a
+comment near it with the feature area as a keyword (like `Middleware: `).
+You can search for these keywords (or even view them in Visual Studio's
+task list, by adding them to the token list at Tools > Options > Task List) to
+find parts of the sample related to feature areas you'd like to see more
+about.
 
-### Code Style Requirements
+Pre-Requisites
+---
+This sample uses [.NET Core 2.0](https://www.microsoft.com/net/download/core).
+To build and run it, you will need the [.NET Core SDK](https://www.microsoft.com/net/download/core).
+You will also need an editor like [Visual Studio 2017](https://www.visualstudio.com/vs/)
+or [Visual Studio Code](https://code.visualstudio.com).
+
+The docker-compose project requires [Docker-for-Windows](https://www.docker.com/docker-windows).
+If you will be using the docker-compose project, make sure [Docker CE](https://store.docker.com/editions/community/docker-ce-desktop-windows)
+is installed on your development machine.
+
+Resources
+---
+
+For more information on ASP.NET Core, see:
+
+* [official documentation](https://docs.microsoft.com/aspnet/core/), the
+* [ASP.NET team blog](https://blogs.msdn.microsoft.com/webdev/), or the
+* [GitHub repo](https://github.com/aspnet/Home)
+
+Code Style Requirements
+---
+
 The code style requirements are enforced with
 [EditorConfig](https://docs.microsoft.com/en-us/visualstudio/ide/create-portable-custom-editor-options)
 via `.editorconfig` and

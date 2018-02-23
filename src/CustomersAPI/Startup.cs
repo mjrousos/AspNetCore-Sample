@@ -113,7 +113,7 @@ namespace CustomersAPI
                 // Middleware: Code after 'next' will usually run after another piece of middleware
                 //             has written a response, so context.Response should not be written to here.
                 timer.Stop();
-                timingLogger.LogInformation($"Request to {context.Request.Method}:{context.Request.Path} processed in {timer.ElapsedMilliseconds} ms");
+                timingLogger.LogInformation("Request to {RequestMethod}:{RequestPath} processed in {ElapsedMilliseconds} ms", context.Request.Method, context.Request.Path, timer.ElapsedMilliseconds);
             });
 
             // Localization: Here we are building a list of supported cultures which will be used in the

@@ -7,6 +7,7 @@ services:
   customersapi:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - ApplicationInsights__InstrumentationKey=${AppInsightsKey}
     ports:
       # Normally, this internal API wouldn't need its port exposed, but I do so here
       # so that I can demo hitting it in a container
@@ -21,3 +22,4 @@ services:
     environment:
       - CustomersAPIService__Url=http://customersapi:5000
       - ASPNETCORE_ENVIRONMENT=Development
+      - ApplicationInsights__InstrumentationKey=${AppInsightsKey}

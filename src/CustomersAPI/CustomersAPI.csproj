@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ApplicationInsightsInitializers\ApplicationInsightsInitializers.csproj" />
     <ProjectReference Include="..\CustomersDataModels\CustomersDataModels.csproj" />
     <ProjectReference Include="..\RequestCorrelation\RequestCorrelation.csproj" />
   </ItemGroup>
@@ -16,9 +17,11 @@
   <ItemGroup>
     <PackageReference Include="Autofac" Version="4.4.0" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.0.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.0" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="2.0.0" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="2.4.0" />
+    <PackageReference Include="Serilog.Sinks.ApplicationInsights" Version="2.5.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="3.1.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="1.0.0" />
   </ItemGroup>

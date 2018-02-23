@@ -1,5 +1,6 @@
 ﻿// Licensed under the MIT license. See LICENSE file in the samples root for full license information.
 
+using ApplicationInsightsInitializers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -17,7 +18,15 @@ namespace CustomersAPI
     {
         public static void Main(string[] args)
         {
+            // Sets the service's name in AppInsights telemetry
+            CloudRoleTelemetryInitializer.SetRoleName("CustomersAPI");
+
             var host = new WebHostBuilder()
+
+                // Enables automatic per-request diagnostics in AppInsights
+                .UseApplicationInsights()
+
+                // Selects Kestrel as the web host (as opposed to Http.Sys)
                 .UseKestrel()
 
                 // Dependency Injection: Services can be registered with the ASP.NET Core DI container at IWebHost build-time
@@ -107,7 +116,15 @@ namespace CustomersAPI
             else
             {
                 var serilogLogger = new LoggerConfiguration()
+
+                                    // This loads serilog sink information from configuration
                                     .ReadFrom.Configuration(config)
+
+                                    // This will send serilog diagnostics to AppInsights as traces (correlated with whichever request
+                                    // was being processed when the diagnostic was logged). This could also be done via a config file,
+                                    // but is done here since it is easier to use an instrumentation key from configuration this way.
+                                    // The CustomersMVC project demonstrates how to send logs directly to AppInsights without using Serilog.
+                                    .WriteTo.ApplicationInsightsTraces(config["ApplicationInsights:InstrumentationKey"])
                                     .CreateLogger();
 
                 loggingBuilder.AddSerilog(serilogLogger);
