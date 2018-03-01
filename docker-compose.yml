@@ -7,7 +7,7 @@ services:
     # Name for the Docker container
     # Note that this will also be the name that other containers
     # can use to refer to this one from within the Docker-compose cluster
-    image: customersapi
+    image: customersapi:${TAG:-latest}
     build:
       # Context is the current directory since individual services' Dockerfiles
       # expect to be built from that shared context so that they can find dependencies
@@ -16,7 +16,7 @@ services:
       dockerfile: /src/CustomersAPI/Dockerfile
 
   customersmvc:
-    image: customersmvc
+    image: customersmvc:${TAG:-latest}
     build:
       context: .
       dockerfile: /src/CustomersMVC/Dockerfile
