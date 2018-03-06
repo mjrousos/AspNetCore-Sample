@@ -26,16 +26,20 @@ RUN dotnet publish --no-restore -c Release -o /app
 # image, but the microsoft/aspnetcore images offer some perf benefits.
 # https://hub.docker.com/r/microsoft/aspnetcore/
 # https://hub.docker.com/r/microsoft/dotnet/
-FROM microsoft/aspnetcore:2.0.5 AS final
+FROM microsoft/aspnetcore:2.0.5
 
 # Set the working directory in the container
 WORKDIR /app
 
-# Expose ports that Kestrel will listen on
-EXPOSE 5000
-
-# This copies the published app from the 'publish' container
+# This copies the published app from the 'builder' container
 # that was created in the previous stage.
 COPY --from=builder /app .
+
+# Declare ports that Kestrel will listen on
+# This doesn't actually publish the port, but
+# functions as documentation to consumers of the
+# container regarding which ports will need to be
+# exposed (via -p with `docker run` for example).
+EXPOSE 5000
 
 ENTRYPOINT ["dotnet", "CustomersAPI.dll"]
