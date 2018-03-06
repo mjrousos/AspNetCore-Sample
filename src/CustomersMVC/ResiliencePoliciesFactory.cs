@@ -37,6 +37,7 @@ namespace CustomersMVC
         {
             // Retry failed requests
             var standardHttpRetry = Policy.Handle<HttpRequestException>()
+
                 // Number of times to retry and backoff function
                 .WaitAndRetryAsync(_retryCount, i => TimeSpan.FromSeconds(Math.Pow(2, i) * 0.5),
                 (exception, waitDuration, retryCount, context) =>
