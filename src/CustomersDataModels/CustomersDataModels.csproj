@@ -17,13 +17,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Update="Resources\CustomersShared.Data.DataEntities.CustomerDataTransferObject.fr-fr.resx">
+    <EmbeddedResource Update="Resources\CustomersShared.Data.DataEntities.CustomerDataTransferObject.fr-FR.resx">
       <Generator>ResXFileCodeGenerator</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Resources\CustomersShared.Data.DataEntities.CustomerDataTransferObject.es-mx.resx">
+    <EmbeddedResource Update="Resources\CustomersShared.Data.DataEntities.CustomerDataTransferObject.es-MX.resx">
       <Generator>ResXFileCodeGenerator</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Resources\CustomersShared.Data.DataEntities.CustomerDataTransferObject.en-us.resx">
+    <EmbeddedResource Update="Resources\CustomersShared.Data.DataEntities.CustomerDataTransferObject.en-US.resx">
       <Generator>ResXFileCodeGenerator</Generator>
     </EmbeddedResource>
   </ItemGroup>
