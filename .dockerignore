@@ -1,0 +1,14 @@
+.dockerignore
+.editorconfig
+.git
+.gitignore
+.vs
+.vscode
+docker-compose*.yml
+docker-compose.dcproj
+k8s
+Packages
+test
+**/bin/
+**/obj/
+*.csproj.user
