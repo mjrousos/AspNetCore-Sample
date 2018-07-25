@@ -46,7 +46,6 @@ namespace CustomersAPI
                 })
                 .ConfigureAppConfiguration(ConfigureAppConfiguration)
                 .ConfigureLogging(ConfigureLogging)
-                .UseUrls("http://+:5000") // Informs Kestrel which ports to listen on; use Kestrel options/listeners for more control
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseIISIntegration()
                 .UseStartup<Startup>()
