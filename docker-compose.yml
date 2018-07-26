@@ -12,4 +12,9 @@ services:
     build:
       context: .
       dockerfile: src/CustomersMVC/Dockerfile
-
+    ports:
+      - "8080:80"
+    depends_on:
+      - customersapi
+    environment:
+      "CustomersAPIService__Url": "http://customersapi"
