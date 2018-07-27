@@ -69,7 +69,7 @@ namespace CustomersAPI.Controllers.Tests
                 var result = customersController.Get();
 
                 // assert
-                Assert.Equal(0, result.Count());
+                Assert.Empty(result);
                 VerifyOnlyLogMessage(testLogger, LoggingGetCustomersText);
             }
         }
@@ -211,7 +211,7 @@ namespace CustomersAPI.Controllers.Tests
 
                 // assert customer was added
                 var customersResult = customersController.Get();
-                Assert.Equal(1, customersResult.Count());
+                Assert.Single(customersResult);
                 var customerResult = customersResult.First();
                 Assert.Equal(newCustomer.FirstName, customerResult.FirstName);
                 Assert.Equal(newCustomer.LastName, customerResult.LastName);
@@ -386,7 +386,6 @@ namespace CustomersAPI.Controllers.Tests
                                           string expectedMessage,
                                           LogLevel expectedLogLevel = LogLevel.Information)
         {
-            Assert.Equal(1, testLogger.LoggedMessages.Count);
             VerifyLogMessage(testLogger, expectedMessage, expectedLogLevel, 0);
         }
 

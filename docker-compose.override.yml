@@ -1,25 +1,15 @@
-version: '3'
+version: '3.4'
 
-# Additional docker-compose files like this one can
-# contain environment-specific settings to easily deploy
-# a core docker-compose file with scenario-specific modifications
 services:
   customersapi:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ApplicationInsights__InstrumentationKey=${AppInsightsKey}
     ports:
-      # Normally, this internal API wouldn't need its port exposed, but I do so here
-      # so that I can demo hitting it in a container
-      - "8080:5000"
+      - "80"
 
   customersmvc:
-    # Environment variables can be specified here.
-    # Notice that : can be replaced with __
-    # 
-    # Note also that this URL refers to our container
-    # using its service name.
     environment:
-      - CustomersAPIService__Url=http://customersapi:5000
       - ASPNETCORE_ENVIRONMENT=Development
-      - ApplicationInsights__InstrumentationKey=${AppInsightsKey}
+    ports:
+      - "80"
+

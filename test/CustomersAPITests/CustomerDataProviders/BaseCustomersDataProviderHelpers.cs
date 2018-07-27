@@ -60,7 +60,7 @@ namespace CustomersAPI.CustomerDataProviders.Tests
                 ZipCode = c.ZipCode
             }).AsEnumerable<CustomerDataTransferObject>();
 
-            Assert.Equal(0, listOfCustomerInfo.Except(compareList).Count());
+            Assert.Empty(listOfCustomerInfo.Except(compareList));
         }
 
         /// <summary>

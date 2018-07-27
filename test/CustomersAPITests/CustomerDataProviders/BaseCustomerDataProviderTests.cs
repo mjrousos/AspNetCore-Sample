@@ -2,6 +2,7 @@
 
 using CustomersShared.Data.DataEntities;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
@@ -20,7 +21,7 @@ namespace CustomersAPI.CustomerDataProviders.Tests
                 var customerEntities = customersDataProvider.GetCustomers();
 
                 // assert
-                Assert.Equal(0, customerEntities.Count());
+                Assert.Empty(customerEntities);
             }
         }
 
@@ -49,7 +50,8 @@ namespace CustomersAPI.CustomerDataProviders.Tests
             }
         }
 
-        public void CustomerExistsWithValidIdReturnsCustomerTrue()
+        [Fact]
+        public void CustomerExistsWithValidIdReturnsTrue()
         {
             using (var customersDataProvider = CreateTestCustomerDataProvider(SampleListOfCustomerDataTransferObjects))
             {
@@ -72,6 +74,7 @@ namespace CustomersAPI.CustomerDataProviders.Tests
             }
         }
 
+        [Fact]
         public void FindCustomerWithValidIdReturnsCustomer()
         {
             using (var customersDataProvider = CreateTestCustomerDataProvider(SampleListOfCustomerDataTransferObjects))
@@ -243,6 +246,7 @@ namespace CustomersAPI.CustomerDataProviders.Tests
             }
         }
 
+        [Fact]
         public void TryFindCustomerWithValidIdReturnsCustomer()
         {
             using (var customersDataProvider = CreateTestCustomerDataProvider(SampleListOfCustomerDataTransferObjects))

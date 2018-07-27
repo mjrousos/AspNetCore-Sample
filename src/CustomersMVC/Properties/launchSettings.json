@@ -18,9 +18,10 @@
     "CustomersMVC": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "http://localhost:5001",
+      "launchUrl": "http://localhost:6000",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS" : "http://localhost:6000"
       }
     }
   }

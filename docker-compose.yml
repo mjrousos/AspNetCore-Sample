@@ -1,28 +1,20 @@
-version: '3'
+version: '3.4'
 
 services:
-  # Each Docker container that's part of the app
-  # should be listed in docker-compose
   customersapi:
-    # Name for the Docker container
-    # Note that this will also be the name that other containers
-    # can use to refer to this one from within the Docker-compose cluster
-    image: customersapi:${TAG:-latest}
+    image: ${DOCKER_REGISTRY}customersapi
     build:
-      # Context is the current directory since individual services' Dockerfiles
-      # expect to be built from that shared context so that they can find dependencies
-      # during their build/publish stages.
       context: .
-      dockerfile: /src/CustomersAPI/Dockerfile
+      dockerfile: src/CustomersAPI/Dockerfile
 
   customersmvc:
-    image: customersmvc:${TAG:-latest}
+    image: ${DOCKER_REGISTRY}customersmvc
     build:
       context: .
-      dockerfile: /src/CustomersMVC/Dockerfile
+      dockerfile: src/CustomersMVC/Dockerfile
+    ports:
+      - "8080:80"
     depends_on:
       - customersapi
     environment:
-      - CustomersAPIService:Url=http://customersapi:5000
-    ports:
-      - "80:5001"
+      "CustomersAPIService__Url": "http://customersapi"
