@@ -1,0 +1,41 @@
+# Kubernetes services are definitions of how pods are exposed for network
+# communication. This information (ports exposed, etc.) is not kept in
+# the pod spec itself since pods can change (go up, down, upgrade, etc.)
+# and it's useful to have a service that exposes an unchanging endpoint
+# for other components to refer to.
+apiVersion: v1
+kind: Service
+metadata:
+  name: customersapiservice
+spec:
+  # Ports indicate which ports are open for network traffic.
+  ports:
+  - port: 5000
+    targetPort: 80
+  # The selector indicates which pods this service exposes
+  selector:
+    app: aspnetcoredemo
+    component: customersapi
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: customersmvcservice
+spec:
+  ports:
+  # 'targetPort' is the container port and 'port' is what it maps to on the host
+  # The application within the pod should listen on 'targetPort' and other components
+  # wishing to use the service should communicate on 'port'.
+  - name: http
+    port: 80
+    targetPort: 80
+  selector:
+    app: aspnetcoredemo
+    component: customersmvc
+  # Setting a service type as loadbalancer means that the service should be exposed
+  # publicly (default behavior is to only expose within the cluster) using a load
+  # balanced supplied by the Kubernetes host environment (Azure Container
+  # Service, for example).
+  type: LoadBalancer

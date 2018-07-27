@@ -5,9 +5,12 @@
 @model IOptions<HomeControllerOptions>
 
 @{
-    ViewBag.Title = Model.Value.Title;
+    ViewData["Title"] = Model.Value.Title;
 }
-<div style="color:lightblue">
-    Welcome to the @Model.Value.Title. This showcases an MVC application calling into a WebApi application. It
-    also shows off some of the cool new features of .NET Core.
+<div>
+    <h1>ASP.NET Core MVC Demo</h1>
+    <p>
+        Welcome to the @Model.Value.Title. This showcases an MVC application calling into a WebApi application. It
+        also shows off some of the cool new features of .NET Core.
+    </p>
 </div>

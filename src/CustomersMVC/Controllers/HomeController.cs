@@ -1,6 +1,7 @@
 ﻿// Licensed under the MIT license. See LICENSE file in the samples root for full license information.
 
 using CustomersMVC.CustomersAPI;
+using CustomersShared.Data.DataEntities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
@@ -31,7 +32,7 @@ namespace CustomersMVC.Controllers
             _localizer = localizer;
         }
 
-        [HttpGet("")]
+        [HttpGet]
         public IActionResult Index()
         {
             // Configuration: Here we are passing the IOptions<HomeControllerOptions> into the view to be used for the model in the view.
@@ -40,24 +41,27 @@ namespace CustomersMVC.Controllers
             return View("Index", _homeControllerOptions);
         }
 
-        // Localization: This method adds the localized ping message from the localizer into the ViewBag. In
+        // Localization: This method adds the localized ping message from the localizer into the ViewData. In
         //               this case we are demonstrating that there is no .resx file for the resources, but the
         //               localizer still returns a message. Once a .resx file exists it will replace the
         //               text with the text from the "PingMessage" inside the .resx for the request culture.
-        [HttpGet("[Controller]/[Action]")]
+        [HttpGet]
         public IActionResult Ping()
         {
-            ViewBag.PingMessage = _localizer["PingMessage"];
+            // Localization: The localized string will have a value of "PingMessage" since
+            //               the resource name is used as a default value if no resource with
+            //               an appropriate name is found.
+            ViewData["PingMessage"] = _localizer["PingMessage"].Value;
             return View();
         }
 
-        [HttpGet("[Controller]/[Action]")]
+        [HttpGet]
         public IActionResult About()
         {
             return View();
         }
 
-        [HttpGet("[Controller]/[Action]")]
+        [HttpGet]
         public async Task<IActionResult> CustomersList()
         {
             SetCorrelationId();
@@ -67,22 +71,50 @@ namespace CustomersMVC.Controllers
             return View(customersList);
         }
 
-        [HttpGet("[Controller]/[Action]")]
+        [HttpGet]
         public IActionResult AddCustomer()
         {
             SetCorrelationId();
 
-            return View();
+            return View(new CustomerDataTransferObject());
         }
 
-        [HttpDelete("[Controller]/[Action]/{customerId}")]
-        public async Task<IActionResult> DeleteCustomer(Guid customerId)
+        [HttpPost]
+        public async Task<IActionResult> AddCustomer(CustomerDataTransferObject customer)
         {
             SetCorrelationId();
 
-            await _customersService.DeleteCustomerAsync(customerId);
+            if (ModelState.IsValid)
+            {
+                await _customersService.AddCustomerAsync(customer);
+                return RedirectToAction(nameof(CustomersList));
+            }
 
-            return RedirectToAction("CustomersList");
+            return View(customer);
+        }
+
+        [HttpGet]
+        public IActionResult Delete(Guid? id)
+        {
+            SetCorrelationId();
+
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            return View(new CustomerEntity { Id = id.Value });
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteCustomer(Guid id)
+        {
+            SetCorrelationId();
+
+            await _customersService.DeleteCustomerAsync(id);
+
+            return RedirectToAction(nameof(CustomersList));
         }
 
         // If the request has a correlation ID, register it with the HTTP client (to be included in outgoing requests)

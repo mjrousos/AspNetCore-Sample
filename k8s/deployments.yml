@@ -1,0 +1,74 @@
+# A Kubernetes deployment includes a pod and information on how the pod
+# should be managed (including desired replicas, deployment strategy,
+# restart behavior, etc.)
+# https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#writing-a-deployment-spec
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: customersapi
+spec:
+  replicas: 1
+  # The template of a deployment specification is a pod specification
+  template:
+    metadata:
+      # This label identifies the pod so that it can be referenced by other
+      # components (like services)
+      labels:
+        app: aspnetcoredemo
+        component: customersapi
+    spec:
+      # A pod contains one or more containers which are deployed together
+      containers:
+      - name: customersapi
+        # Kubernetes doesn't allow parameterized manifests, so this is a placeholder
+        # that our deploy.ps1 script will replace at runtime
+        # (since the image will depend on which container registry is being used)
+        image: <CustomersApiImage>
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        # Environment variables are the most common way of specifying configuration
+        # for Kubernetes-hosted services. As shown here, the config values can come from
+        # Kubernetes' secret store or (as shown below) can be hardcoded
+        env:
+        - name: ApplicationInsights__InstrumentationKey
+          valueFrom:
+            secretKeyRef:
+              name: aspnetcoredemo-secrets
+              key: AppInsightsKey
+      # An image pull secret is the secret used to connect with a private Docker registry
+      imagePullSecrets:
+      - name: registry-key
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: customersmvc
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: aspnetcoredemo
+        component: customersmvc
+    spec:
+      imagePullSecrets:
+      - name: registry-key
+      containers:
+      - name: customersmvc
+        image: <CustomersMvcImage>
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        env:
+        # Kubernetes DNS will expose services based on their name, so we set
+        # CustomersAPIService__Url to use the CustomersApi service's name
+        - name: CustomersAPIService__Url
+          value: http://customersapiservice:5000
+        - name: ApplicationInsights__InstrumentationKey
+          valueFrom:
+            secretKeyRef:
+              name: aspnetcoredemo-secrets
+              key: AppInsightsKey

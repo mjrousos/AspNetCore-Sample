@@ -3,18 +3,27 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title>@ViewBag.Title</title>
+    <title>@ViewData["Title"]</title>
+    <link href="~/lib/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
 </head>
-<body>
-    <p>
-        @Html.ActionLink("Home", "Index", "Home") &nbsp; &nbsp;
-        @Html.ActionLink("Customers", "CustomersList", "Home") &nbsp; &nbsp;
-        @Html.ActionLink("About", "About", "Home") &nbsp; &nbsp;
-    </p>
-    <p>
-        Something from layout page!
-    </p>
-
-    @RenderBody()
+<body style="padding-top:50px; padding-bottom:20px">
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li>@Html.ActionLink("Home", "Index", "Home", new { }, new { @class = "navbar-brand" })</li>
+                    <li>@Html.ActionLink("Customers", "CustomersList", "Home", new { }, new { @class = "navbar-brand" })</li>
+                    <li>@Html.ActionLink("About", "About", "Home", new { }, new { @class = "navbar-brand" })</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="container body-content">
+        <hr />
+        @RenderBody()
+        <hr />
+    </div>
 </body>
 </html>

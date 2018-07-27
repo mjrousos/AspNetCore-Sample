@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Globalization;
 using System.Net.Http;
@@ -34,24 +35,37 @@ namespace CustomersMVC
               .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
               .AddDataAnnotationsLocalization();
 
-            // Add the CustomersApiService into the dependency container
-            services.AddSingleton<CustomersAPIService>(CreateCustomersAPIService());
-
             // Configuration: Here we add the HomeControllerOptions and set it to the Configurations HomeControllerOptions section
             //                which in this case came from the appsettings.json files. This is a convenient way to pass configuration
             //                options around using dependency injection. It also helps scope just the options that apply to logical
             //                parts of the application to those parts of the application versus passing all configuration to all logical
             //                parts of the application.
             services.Configure<HomeControllerOptions>(Configuration.GetSection("HomeControllerOptions"));
+
+            // Register a ResiliencePoliciesFactory and then use it to create
+            // and register the Policy[] to be used
+            services.AddTransient<ResiliencePoliciesFactory>();
+            services.AddSingleton(sp =>
+                sp.GetRequiredService<ResiliencePoliciesFactory>().CreatePolicies());
+
+            // Add the HttpClient used to access other services
+            services.AddSingleton(CreateHttpClient());
+
+            // Add the CustomersApiService into the dependency container
+            services.AddSingleton<CustomersAPIService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+            // It shouldn't be necessary to add logging providers in startup.cs anymore (they belong in program.cs)
+            // but this one is required due to a bug in Application Insights
+            // https://github.com/Microsoft/ApplicationInsights-aspnetcore/issues/536
+            loggerFactory.AddApplicationInsights(app.ApplicationServices, LogLevel.Information);
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseBrowserLink();
             }
             else
             {
@@ -93,14 +107,6 @@ namespace CustomersMVC
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
-        }
-
-        /// <summary>
-        /// Creates a CustomerApiService instance
-        /// </summary>
-        private CustomersAPIService CreateCustomersAPIService()
-        {
-            return new CustomersAPIService(CreateHttpClient());
         }
 
         /// <summary>

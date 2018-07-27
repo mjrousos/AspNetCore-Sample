@@ -1,26 +1,22 @@
-# Use a base image that extends microsoft/dotnet:1.0-runtime
-# by adding some ASP.NET Core env vars and precompiled ASP.NET Core libraries.
-#
-# ASP.NET Core apps can just as easily work directly from a microsoft/dotnet base
-# image, but the microsoft/aspnetcore images offer some perf benefits.
-# https://hub.docker.com/r/microsoft/aspnetcore/
-# https://hub.docker.com/r/microsoft/dotnet/
-FROM microsoft/aspnetcore:2.0.0
-
-# The optional source arg is just to allow
-# overriding the location that published output
-# is copied from.
-ARG source
-
+FROM microsoft/dotnet:2.1-aspnetcore-runtime AS base
 WORKDIR /app
+EXPOSE 80
 
-# Expose ports that Kestrel will listen on
-EXPOSE 5001
+FROM microsoft/dotnet:2.1-sdk AS build
+WORKDIR /src
+COPY src/CustomersMVC/CustomersMVC.csproj src/CustomersMVC/
+COPY src/CustomersDataModels/CustomersDataModels.csproj src/CustomersDataModels/
+COPY src/RequestCorrelation/RequestCorrelation.csproj src/RequestCorrelation/
+COPY src/ApplicationInsightsInitializers/ApplicationInsightsInitializers.csproj src/ApplicationInsightsInitializers/
+RUN dotnet restore src/CustomersMVC/CustomersMVC.csproj
+COPY . .
+WORKDIR /src/src/CustomersMVC
+RUN dotnet build CustomersMVC.csproj -c Release -o /app
 
-# Notice that, by default, this copies
-# from a folder that's populated by docker-compose.ci.build.
-# Depending on how you're building, this path may need updated
-# (or a source explicitly passed).
-COPY ${source:-obj/Docker/publish} .
+FROM build AS publish
+RUN dotnet publish CustomersMVC.csproj -c Release -o /app
 
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app .
 ENTRYPOINT ["dotnet", "CustomersMVC.dll"]

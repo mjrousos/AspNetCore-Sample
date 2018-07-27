@@ -1,14 +1,43 @@
 ASPNET Core Sample Of Customers
 ===
 
-This is an application using a customer data model written with ASPNET Core.
+This is an application using a customer data model written with ASP.NET Core.
 There are several projects including REST apis, data models, middleware and an
-MVC front end. Included is a CustomersHandsOnLab.html which walks through
-features of the application including some exercises for building out a fuller
-featured MVC front end. Most of the ASPNET Core features are showcased and well
-documented in the CustomersAPI project.
+MVC front end. Many ASP.NET Core features are showcased and documented in the
+CustomersAPI project. The CustomersMVC project shows a few additional
+MVC-specific features.
 
-### Code Style Requirements
+Most code which relates to a particular feature area (configuration,
+dependency injection, localization, logging, middleware, routing) has a
+comment near it with the feature area as a keyword (like `Middleware: `).
+You can search for these keywords (or even view them in Visual Studio's
+task list, by adding them to the token list at Tools > Options > Task List) to
+find parts of the sample related to feature areas you'd like to see more
+about.
+
+Pre-Requisites
+---
+This sample uses [.NET Core 2.1](https://www.microsoft.com/net/download/core).
+To build and run it, you will need the [.NET Core SDK](https://www.microsoft.com/net/download/core).
+You will also need an editor like [Visual Studio 2017](https://www.visualstudio.com/vs/)
+or [Visual Studio Code](https://code.visualstudio.com).
+
+The docker-compose project requires [Docker-for-Windows](https://www.docker.com/docker-windows).
+If you will be using the docker-compose project, make sure [Docker CE](https://store.docker.com/editions/community/docker-ce-desktop-windows)
+is installed on your development machine.
+
+Resources
+---
+
+For more information on ASP.NET Core, see:
+
+* [official documentation](https://docs.microsoft.com/aspnet/core/), the
+* [ASP.NET team blog](https://blogs.msdn.microsoft.com/webdev/), or the
+* [GitHub repo](https://github.com/aspnet/Home)
+
+Code Style Requirements
+---
+
 The code style requirements are enforced with
 [EditorConfig](https://docs.microsoft.com/en-us/visualstudio/ide/create-portable-custom-editor-options)
 via `.editorconfig` and
