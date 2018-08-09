@@ -56,7 +56,7 @@
     az aks get-credentials --resource-group ${resource_group} --name aks --admin  
     docker login ${acr_server} -u ${acr_username} -p ${acr_password}  
     export regsec=$(cat ~/.docker/config.json | base64  | tr -d '\n')  
-    cat k8s/secret.yaml | sed "s/dockersecret/${regsec}/g" | kubectl create -f -  
+    cat cicd/secret.yaml | sed "s/dockersecret/${regsec}/g" | kubectl create -f -  
     kubectl create secret generic aspnetcoredemo-secrets --from-literal=AppInsightsKey=$ai_key
     ```
 
@@ -70,7 +70,7 @@
 
 1. deploy application into AKS
     ```bash
-    cat k8s.yaml | sed -e "s/YourACRName/${acr_username}/g" -e "s/build_number/0/g" | kubectl create -f -  
+    cat cicd/k8s.yaml | sed -e "s/YourACRName/${acr_username}/g" -e "s/build_number/0/g" | kubectl create -f -  
     ```
 
 # Setup CICD pipeline
@@ -112,9 +112,7 @@ node {
             )
     }
     stage('Deploy into k8s') {
-      sh(script: "cat k8s/k8s.yaml | sed -e 's/build_number/${BUILD_NUMBER}/g' -e 's/YourACRName/${acr_username}/g' | kubectl apply -f - --kubeconfig /var/lib/jenkins/.kube/config", returnStdout: true)
+      sh(script: "cat cicd/k8s.yaml | sed -e 's/build_number/${BUILD_NUMBER}/g' -e 's/YourACRName/${acr_username}/g' | kubectl apply -f - --kubeconfig /var/lib/jenkins/.kube/config", returnStdout: true)
     }
 }
 ```
-
-p.s You need to folk the repo and update ACR url in k8s/k8s.yaml to make the Jenkins job work.
