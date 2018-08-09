@@ -11,6 +11,7 @@ spec:
   # Ports indicate which ports are open for network traffic.
   ports:
   - port: 5000
+    targetPort: 80
   # The selector indicates which pods this service exposes
   selector:
     app: aspnetcoredemo
@@ -29,7 +30,7 @@ spec:
   # wishing to use the service should communicate on 'port'.
   - name: http
     port: 80
-    targetPort: 5001
+    targetPort: 80
   selector:
     app: aspnetcoredemo
     component: customersmvc

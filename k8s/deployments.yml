@@ -26,7 +26,7 @@ spec:
         image: <CustomersApiImage>
         imagePullPolicy: Always
         ports:
-        - containerPort: 5000
+        - containerPort: 80
         # Environment variables are the most common way of specifying configuration
         # for Kubernetes-hosted services. As shown here, the config values can come from
         # Kubernetes' secret store or (as shown below) can be hardcoded
@@ -61,7 +61,7 @@ spec:
         image: <CustomersMvcImage>
         imagePullPolicy: Always
         ports:
-        - containerPort: 5001
+        - containerPort: 80
         env:
         # Kubernetes DNS will expose services based on their name, so we set
         # CustomersAPIService__Url to use the CustomersApi service's name

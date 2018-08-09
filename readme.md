@@ -17,7 +17,7 @@ about.
 
 Pre-Requisites
 ---
-This sample uses [.NET Core 2.0](https://www.microsoft.com/net/download/core).
+This sample uses [.NET Core 2.1](https://www.microsoft.com/net/download/core).
 To build and run it, you will need the [.NET Core SDK](https://www.microsoft.com/net/download/core).
 You will also need an editor like [Visual Studio 2017](https://www.visualstudio.com/vs/)
 or [Visual Studio Code](https://code.visualstudio.com).
