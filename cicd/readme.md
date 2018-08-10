@@ -16,52 +16,50 @@
 
 1. set group_suffix value
     ```bash
-    group_suffix=$((RANDOM % 100000))  
+    group_suffix=$((RANDOM % 100000))
     ```
 
 1. set target location
     ```bash
-    targetlocation=eastus  
+    targetlocation=eastus
     ```
 
 1. generate resource group names
     ```bash
-    resource_group=AspnetCoreDemo${group_suffix}  
+    resource_group=AspnetCoreDemo${group_suffix}
     ```
 
 1. create resource group and provision Azure ACR
     ```bash
-    az group create -n ${resource_group} -l ${targetlocation}  
-    az acr create -n ${resource_group,,} -g ${resource_group} --admin-enabled true --sku Standard  
-    export acr_name=${resource_group,,}  
-    export acr_username=$(az acr credential show -g ${resource_group} -n ${acr_name} --query username | tr -d '"')  
-    export acr_password=$(az acr credential show -g ${resource_group} -n ${acr_name} --query passwords[0].value | tr -d '"')  
-    export acr_server=$(az acr show -g ${resource_group} -n ${acr_name} --query loginServer | tr -d '"')  
+    az group create -n ${resource_group} -l ${targetlocation}
+    az acr create -n ${resource_group,,} -g ${resource_group} --admin-enabled true --sku Standard
+    export acr_name=${resource_group,,}
+    export acr_username=$(az acr credential show -g ${resource_group} -n ${acr_name} --query username | tr -d '"')
+    export acr_password=$(az acr credential show -g ${resource_group} -n ${acr_name} --query passwords[0].value | tr -d '"')
+    export acr_server=$(az acr show -g ${resource_group} -n ${acr_name} --query loginServer | tr -d '"')
     ```
 
 1. create Azure Application Insights
     ```bash
-    az resource create -g ${resource_group} --resource-type "Microsoft.Insights/components" -n ${resource_group}ai -l ${targetlocation} --properties '{"ApplicationId":"facerecognition","Application_Type":"other", "Flow_Type":"Redfield", "Request_Source":"IbizaAIExtension"}'  
+    az resource create -g ${resource_group} --resource-type "Microsoft.Insights/components" -n ${resource_group}ai -l ${targetlocation} --properties '{"ApplicationId":"facerecognition","Application_Type":"other", "Flow_Type":"Redfield", "Request_Source":"IbizaAIExtension"}'
     export ai_key=$(az resource show -g ${resource_group} --resource-type "Microsoft.Insights/components" -n ${resource_group}ai --query properties.InstrumentationKey --o tsv)
     ```
 
 1. create Azure Kubernetes Service (AKS)
     ```bash
-    az aks create -g ${resource_group} -n aks --node-count 1 --generate-ssh-keys  
+    az aks create -g ${resource_group} -n aks --node-count 1 --generate-ssh-keys
     ```
 
 1. create secret in AKS
     ```bash
-    rm ~/.kube/config  
-    az aks get-credentials --resource-group ${resource_group} --name aks --admin  
-    docker login ${acr_server} -u ${acr_username} -p ${acr_password}  
-    export regsec=$(cat ~/.docker/config.json | base64  | tr -d '\n')  
-    cat cicd/secret.yaml | sed "s/dockersecret/${regsec}/g" | kubectl create -f -  
+    az aks get-credentials --resource-group ${resource_group} --name aks --admin
+    kubectl create secret docker-registry regsecret --docker-server=${acr_server} --docker-username=${acr_username} --docker-password=${acr_password} --docker-email=xy@test.com
     kubectl create secret generic aspnetcoredemo-secrets --from-literal=AppInsightsKey=$ai_key
     ```
 
 1. build application and push to docker registry
     ```bash
+    docker login ${acr_server} -u ${acr_username} -p ${acr_password}
     docker build -f src/CustomersAPI/Dockerfile -t $acr_server/customersapi:0 .
     docker push $acr_server/customersapi:0
     docker build -f src/CustomersMVC/Dockerfile -t $acr_server/customersmvc:0 .
@@ -70,7 +68,7 @@
 
 1. deploy application into AKS
     ```bash
-    cat cicd/k8s.yaml | sed -e "s/YourACRName/${acr_username}/g" -e "s/build_number/0/g" | kubectl create -f -  
+    cat cicd/k8s.yaml | sed -e "s/YourACRName/${acr_username}/g" -e "s/build_number/0/g" | kubectl create -f -
     ```
 
 # Setup CICD pipeline
