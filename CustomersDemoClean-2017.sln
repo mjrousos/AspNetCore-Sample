@@ -1,0 +1,95 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2027
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomersAPI", "src\CustomersAPI\CustomersAPI.csproj", "{37442FA6-57F6-4452-949D-5037EB78ACCE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomersDataModels", "src\CustomersDataModels\CustomersDataModels.csproj", "{EDA0979D-8322-45A6-A38D-57F6C54789E8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomersMVC", "src\CustomersMVC\CustomersMVC.csproj", "{034FCE47-B41A-4666-9F1C-8129775C9D21}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{0EB5E9E3-A290-440F-9F47-E725F168EFD4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomersAPITests", "test\CustomersAPITests\CustomersAPITests.csproj", "{A5C3156E-EBC8-4887-9102-53A892D1E2CA}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E8C4A335-B6B8-4ACE-BE7E-FBED1621D113} = {E8C4A335-B6B8-4ACE-BE7E-FBED1621D113}
+		{EDA0979D-8322-45A6-A38D-57F6C54789E8} = {EDA0979D-8322-45A6-A38D-57F6C54789E8}
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RequestCorrelation", "src\RequestCorrelation\RequestCorrelation.csproj", "{E8C4A335-B6B8-4ACE-BE7E-FBED1621D113}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{6E9172F3-2D5D-41D0-8CBD-A0DE51CFF72C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9C459866-AD4E-4BF4-ABF1-3BF707D9C400}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		CodeStyles.ruleset = CodeStyles.ruleset
+		CustomersHandsOnLab.html = CustomersHandsOnLab.html
+		Directory.Build.props = Directory.Build.props
+		Directory.Build.targets = Directory.Build.targets
+		LICENSE = LICENSE
+		README.md = README.md
+		stylecop.json = stylecop.json
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomersDemoTestHelpers", "test\CustomersDemoTestHelpers\CustomersDemoTestHelpers.csproj", "{A9B095F4-6553-406F-81BC-17EB03636E2F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApplicationInsightsInitializers", "src\ApplicationInsightsInitializers\ApplicationInsightsInitializers.csproj", "{7D6A5E69-187A-4FAA-997C-D6C1FA41FE32}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{37442FA6-57F6-4452-949D-5037EB78ACCE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37442FA6-57F6-4452-949D-5037EB78ACCE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37442FA6-57F6-4452-949D-5037EB78ACCE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37442FA6-57F6-4452-949D-5037EB78ACCE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EDA0979D-8322-45A6-A38D-57F6C54789E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EDA0979D-8322-45A6-A38D-57F6C54789E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EDA0979D-8322-45A6-A38D-57F6C54789E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EDA0979D-8322-45A6-A38D-57F6C54789E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{034FCE47-B41A-4666-9F1C-8129775C9D21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{034FCE47-B41A-4666-9F1C-8129775C9D21}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{034FCE47-B41A-4666-9F1C-8129775C9D21}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{034FCE47-B41A-4666-9F1C-8129775C9D21}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A5C3156E-EBC8-4887-9102-53A892D1E2CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5C3156E-EBC8-4887-9102-53A892D1E2CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5C3156E-EBC8-4887-9102-53A892D1E2CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5C3156E-EBC8-4887-9102-53A892D1E2CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{27C6BDC1-A0F8-4BF8-A6D3-071D7BCB2EDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27C6BDC1-A0F8-4BF8-A6D3-071D7BCB2EDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27C6BDC1-A0F8-4BF8-A6D3-071D7BCB2EDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27C6BDC1-A0F8-4BF8-A6D3-071D7BCB2EDE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E8C4A335-B6B8-4ACE-BE7E-FBED1621D113}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E8C4A335-B6B8-4ACE-BE7E-FBED1621D113}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E8C4A335-B6B8-4ACE-BE7E-FBED1621D113}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E8C4A335-B6B8-4ACE-BE7E-FBED1621D113}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9B095F4-6553-406F-81BC-17EB03636E2F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9B095F4-6553-406F-81BC-17EB03636E2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9B095F4-6553-406F-81BC-17EB03636E2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9B095F4-6553-406F-81BC-17EB03636E2F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D6A5E69-187A-4FAA-997C-D6C1FA41FE32}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D6A5E69-187A-4FAA-997C-D6C1FA41FE32}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D6A5E69-187A-4FAA-997C-D6C1FA41FE32}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D6A5E69-187A-4FAA-997C-D6C1FA41FE32}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{37442FA6-57F6-4452-949D-5037EB78ACCE} = {6E9172F3-2D5D-41D0-8CBD-A0DE51CFF72C}
+		{EDA0979D-8322-45A6-A38D-57F6C54789E8} = {6E9172F3-2D5D-41D0-8CBD-A0DE51CFF72C}
+		{034FCE47-B41A-4666-9F1C-8129775C9D21} = {6E9172F3-2D5D-41D0-8CBD-A0DE51CFF72C}
+		{A5C3156E-EBC8-4887-9102-53A892D1E2CA} = {0EB5E9E3-A290-440F-9F47-E725F168EFD4}
+		{E8C4A335-B6B8-4ACE-BE7E-FBED1621D113} = {6E9172F3-2D5D-41D0-8CBD-A0DE51CFF72C}
+		{A9B095F4-6553-406F-81BC-17EB03636E2F} = {0EB5E9E3-A290-440F-9F47-E725F168EFD4}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {83FD1022-65CE-40E2-B231-16FDF0EC585F}
+	EndGlobalSection
+EndGlobal
