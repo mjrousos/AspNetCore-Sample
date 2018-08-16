@@ -1,0 +1,118 @@
+# A Kubernetes deployment includes a pod and information on how the pod
+# should be managed (including desired replicas, deployment strategy,
+# restart behavior, etc.)
+# https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#writing-a-deployment-spec
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: customersapi
+spec:
+  replicas: 1
+  # The template of a deployment specification is a pod specification
+  template:
+    metadata:
+      # This label identifies the pod so that it can be referenced by other
+      # components (like services)
+      labels:
+        app: aspnetcoredemo
+        component: customersapi
+    spec:
+      # A pod contains one or more containers which are deployed together
+      containers:
+      - name: customersapi
+        # Kubernetes doesn't allow parameterized manifests, so this is a placeholder
+        # that our deploy.ps1 script will replace at runtime
+        # (since the image will depend on which container registry is being used)
+        image: YourACRName.azurecr.io/customersapi:build_number
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        # Environment variables are the most common way of specifying configuration
+        # for Kubernetes-hosted services. As shown here, the config values can come from
+        # Kubernetes' secret store or (as shown below) can be hardcoded
+        env:
+        - name: ApplicationInsights__InstrumentationKey
+          valueFrom:
+            secretKeyRef:
+              name: aspnetcoredemo-secrets
+              key: AppInsightsKey
+      # An image pull secret is the secret used to connect with a private Docker registry
+      imagePullSecrets:
+      - name: regsecret
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: customersmvc
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: aspnetcoredemo
+        component: customersmvc
+    spec:
+      imagePullSecrets:
+      - name: regsecret
+      containers:
+      - name: customersmvc
+        image: YourACRName.azurecr.io/customersmvc:build_number
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        env:
+        # Kubernetes DNS will expose services based on their name, so we set
+        # CustomersAPIService__Url to use the CustomersApi service's name
+        - name: CustomersAPIService__Url
+          value: http://customersapiservice:5000
+        - name: ApplicationInsights__InstrumentationKey
+          valueFrom:
+            secretKeyRef:
+              name: aspnetcoredemo-secrets
+              key: AppInsightsKey
+
+---
+# Kubernetes services are definitions of how pods are exposed for network
+# communication. This information (ports exposed, etc.) is not kept in
+# the pod spec itself since pods can change (go up, down, upgrade, etc.)
+# and it's useful to have a service that exposes an unchanging endpoint
+# for other components to refer to.
+apiVersion: v1
+kind: Service
+metadata:
+  name: customersapiservice
+spec:
+  # Ports indicate which ports are open for network traffic.
+  ports:
+  - port: 5000
+    targetPort: 80
+  # The selector indicates which pods this service exposes
+  selector:
+    app: aspnetcoredemo
+    component: customersapi
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: customersmvcservice
+spec:
+  ports:
+  # 'targetPort' is the container port and 'port' is what it maps to on the host
+  # The application within the pod should listen on 'targetPort' and other components
+  # wishing to use the service should communicate on 'port'.
+  - name: http
+    port: 80
+    targetPort: 80
+  selector:
+    app: aspnetcoredemo
+    component: customersmvc
+  # Setting a service type as loadbalancer means that the service should be exposed
+  # publicly (default behavior is to only expose within the cluster) using a load
+  # balanced supplied by the Kubernetes host environment (Azure Container
+  # Service, for example).
+  type: LoadBalancer
+
