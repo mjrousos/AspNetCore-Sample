@@ -42,7 +42,7 @@ stage('Build Docker Image') {
                 //implement Kubernetes deployment here
                 kubernetesDeploy(
                     kubeconfigId: 'kubeconfig',
-                    configs: 'train-schedule-kube.yml',
+                    configs: 'k8s.yml',
                     enableConfigSubstitution: true
                 )
             }
