@@ -23,7 +23,7 @@ spec:
         # Kubernetes doesn't allow parameterized manifests, so this is a placeholder
         # that our deploy.ps1 script will replace at runtime
         # (since the image will depend on which container registry is being used)
-        image: YourACRName.azurecr.io/customersapi:build_number
+        image: $DOCKER_IMAGE_NAME:$BUILD_NUMBER
         imagePullPolicy: Always
         ports:
         - containerPort: 80
@@ -58,7 +58,7 @@ spec:
       - name: regsecret
       containers:
       - name: customersmvc
-        image: YourACRName.azurecr.io/customersmvc:build_number
+        image: $DOCKER_IMAGE_NAME:$BUILD_NUMBER
         imagePullPolicy: Always
         ports:
         - containerPort: 80
