@@ -1,26 +1,50 @@
 node {
     def built_img = ''
     stage('Checkout git repo') {
-      git branch: 'master', url: params.git_repo
+      git branch: 'test', url: params.git_repo
     }
-    stage('Build and push Docker image') {
-      sh(script: "docker login ${registry_url} -u ${acr_username} -p ${acr_password}", returnStdout: true)
-      sh(script: "docker build -t ${registry_url}/customersapi:${BUILD_NUMBER} -f src/CustomersAPI/Dockerfile .", returnStdout: true)
-      sh(script: "docker push ${registry_url}/customersapi:${BUILD_NUMBER}", returnStdout: true)
-      sh(script: "docker build -t ${registry_url}/customersmvc:${BUILD_NUMBER} -f src/CustomersMVC/Dockerfile .", returnStdout: true)
-      sh(script: "docker push ${registry_url}/customersmvc:${BUILD_NUMBER}", returnStdout: true)
+    
+stage('Build Docker Image') {
+            when {
+                branch 'test'
+            }
+            steps {
+                script {
+                    app = docker.build(DOCKER_IMAGE_NAME)
+                    app.inside {
+                        sh 'echo Hello, World!'
+                    }
+                }
+            }
+        }
+        stage('Push Docker Image') {
+            when {
+                branch 'test'
+            }
+            steps {
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
+                        app.push("${env.BUILD_NUMBER}")
+                        app.push("latest")
+                    }
+                }
+            }
+        }
+
+
+        stage('DeployToProduction') {
+            when {
+                branch 'test'
+            }
+            steps {
+                input 'Deploy to Production?'
+                milestone(1)
+                //implement Kubernetes deployment here
+                kubernetesDeploy(
+                    kubeconfigId: 'kubeconfig',
+                    configs: 'k8s.yml',
+                    enableConfigSubstitution: true
+                )
+            }
+        }
     }
-    stage('Unit Tests') {
-      sh 'echo test'
-    }
-    stage('Browser Tests'){
-        parallel(
-            "Edge":{sh 'echo test'},
-            "Firefox":{sh 'echo test'},
-            "Chrome":{sh 'echo test'}
-            )
-    }
-    stage('Deploy into k8s') {
-      sh(script: "cat cicd/k8s.yaml | sed -e 's/build_number/${BUILD_NUMBER}/g' -e 's/YourACRName/${acr_username}/g' | kubectl apply -f - --kubeconfig /var/lib/jenkins/.kube/config", returnStdout: true)
-    }
-}
